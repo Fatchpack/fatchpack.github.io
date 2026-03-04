@@ -11,7 +11,10 @@
     body{background:var(--darker);color:#cdd9ff;font-family:'Rajdhani',sans-serif;font-size:16px;overflow-x:hidden;cursor:crosshair;}
     body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.12) 2px,rgba(0,0,0,0.12) 4px);pointer-events:none;z-index:9999;}
     .grid-bg{position:fixed;inset:0;background-image:linear-gradient(var(--grid-color) 1px,transparent 1px),linear-gradient(90deg,var(--grid-color) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;}
-    nav{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:70px;background:linear-gradient(180deg,rgba(3,6,16,0.98) 0%,rgba(3,6,16,0.8) 100%);border-bottom:1px solid rgba(0,245,255,0.15);backdrop-filter:blur(12px);}
+    .dev-banner{position:fixed;top:0;left:0;right:0;z-index:1001;height:38px;display:flex;align-items:center;justify-content:center;gap:14px;background:linear-gradient(90deg,rgba(0,245,255,0.06) 0%,rgba(255,0,110,0.06) 50%,rgba(0,245,255,0.06) 100%);border-bottom:1px solid rgba(0,245,255,0.2);backdrop-filter:blur(8px);font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:rgba(205,217,255,0.75);overflow:hidden;}
+    .dev-banner em{font-style:normal;color:var(--cyan);}
+    .dev-banner-pip{width:6px;height:6px;background:var(--magenta);clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);box-shadow:0 0 8px var(--magenta);flex-shrink:0;animation:pulse 2s ease-in-out infinite;}
+    nav{position:fixed;top:38px;left:0;right:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:70px;background:linear-gradient(180deg,rgba(3,6,16,0.98) 0%,rgba(3,6,16,0.8) 100%);border-bottom:1px solid rgba(0,245,255,0.15);backdrop-filter:blur(12px);}
     .nav-logo{font-family:'Orbitron',monospace;font-weight:900;font-size:1.2rem;letter-spacing:.15em;color:var(--cyan);text-shadow:var(--glow-cyan);text-decoration:none;}
     .nav-logo span{color:var(--magenta);}
     .nav-links{display:flex;gap:28px;list-style:none;align-items:center;}
@@ -22,7 +25,7 @@
     .nav-cta{font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dark);background:var(--magenta);padding:8px 20px;text-decoration:none;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:background .2s;}
     .nav-cta:hover{background:#ff3d8a;}
 
-    .page-top{padding-top:70px;position:relative;z-index:1;}
+    .page-top{padding-top:108px;position:relative;z-index:1;}
     .page-hero{padding:70px 60px 50px;border-bottom:1px solid rgba(0,245,255,0.08);position:relative;overflow:hidden;}
     .page-hero::before{content:'';position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(0,245,255,0.06) 0%,transparent 70%);top:-150px;right:-100px;border-radius:50%;pointer-events:none;}
     .page-eyebrow{font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.4em;text-transform:uppercase;color:var(--magenta);margin-bottom:12px;display:flex;align-items:center;gap:10px;}
@@ -78,6 +81,14 @@
 </head>
 <body>
 <div class="grid-bg"></div>
+
+<!-- DEV BANNER -->
+<div class="dev-banner">
+  <div class="dev-banner-pip"></div>
+  <span><em>Site In Development</em> &mdash; Content is being actively updated</span>
+  <div class="dev-banner-pip"></div>
+</div>
+
 <nav>
   <a href="/" class="nav-logo">NEON<span>.</span>NEXUS</a>
   <ul class="nav-links">
@@ -102,8 +113,19 @@
 
       <div class="update-item">
         <div class="update-date">
-          October 4, 2024
+          March 4, 2026
           <span class="latest-tag">Latest</span>
+        </div>
+        <div class="update-card">
+          <span class="tag tag-cards">Artwork</span>
+          <h3>Replacing Placeholder Art with Original Pieces</h3>
+          <p>The team is actively working on replacing all placeholder AI-generated artwork with original pieces created by the founder and collaborating artists. This is a key step in the development of Neon Nexus TCG, and updates will be shared as new art is revealed.</p>
+        </div>
+      </div>
+
+      <div class="update-item">
+        <div class="update-date">
+          October 4, 2024
         </div>
         <div class="update-card">
           <span class="tag tag-rules">Rules</span>

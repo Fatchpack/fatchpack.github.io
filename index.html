@@ -3,7 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Neon Nexus TCG</title>
+  <title>Neon Nexus TCG — Sci-Fi Cyberpunk Trading Card Game</title>
+  <meta name="description" content="Neon Nexus TCG is a sci-fi cyberpunk trading card game currently in development. Command one of five syndicates, build your deck, and battle for control of the city. Join the Discord and follow development updates." />
+  <meta name="keywords" content="trading card game, TCG, sci-fi, cyberpunk, neon, card game, Neon Nexus, Neon Nexus TCG, cyberpunk TCG, indie card game, sci-fi TCG" />
+  <link rel="canonical" href="https://neonnexustcg.com/" />
+
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://neonnexustcg.com/" />
+  <meta property="og:title" content="Neon Nexus TCG — Sci-Fi Cyberpunk Trading Card Game" />
+  <meta property="og:description" content="Four syndicates. One city. Infinite power plays. Neon Nexus is a cyberpunk trading card game currently in development. Back us on Kickstarter and be first into the city." />
+  <meta property="og:site_name" content="Neon Nexus TCG" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Neon Nexus TCG — Sci-Fi Cyberpunk Trading Card Game" />
+  <meta name="twitter:description" content="Four syndicates. One city. Infinite power plays. A cyberpunk TCG currently in development." />
+
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
@@ -59,10 +75,61 @@
       z-index: 0;
     }
 
+    /* ── DEV BANNER ── */
+    .dev-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1001;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      background: linear-gradient(90deg, rgba(0,245,255,0.06) 0%, rgba(255,0,110,0.06) 50%, rgba(0,245,255,0.06) 100%);
+      border-bottom: 1px solid rgba(0,245,255,0.2);
+      backdrop-filter: blur(8px);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(205,217,255,0.75);
+      overflow: hidden;
+    }
+
+    .dev-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(0,245,255,0.04) 50%, transparent 100%);
+      animation: bannerShimmer 4s ease-in-out infinite;
+    }
+
+    @keyframes bannerShimmer {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 1; }
+    }
+
+    .dev-banner-pip {
+      width: 6px;
+      height: 6px;
+      background: var(--magenta);
+      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      box-shadow: 0 0 8px var(--magenta);
+      flex-shrink: 0;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .dev-banner em {
+      font-style: normal;
+      color: var(--cyan);
+    }
+
     /* ── NAV ── */
     nav {
       position: fixed;
-      top: 0;
+      top: 38px;
       left: 0;
       right: 0;
       z-index: 1000;
@@ -914,7 +981,7 @@
       .nav-links { display: none; }
       .container { padding: 0 20px; }
       .lore-grid { grid-template-columns: 1fr; gap: 48px; }
-      .features-grid { grid-template-columns: 1fr; } .features-grid[style*="repeat(5"] { grid-template-columns: 1fr 1fr; }
+      .features-grid { grid-template-columns: 1fr; }
       .cards-header { flex-direction: column; align-items: flex-start; gap: 20px; }
       .newsletter-inner { flex-direction: column; padding: 32px; }
       .newsletter-form { flex-direction: column; }
@@ -926,6 +993,13 @@
 </head>
 <body>
   <div class="grid-bg"></div>
+
+  <!-- DEV BANNER -->
+  <div class="dev-banner">
+    <div class="dev-banner-pip"></div>
+    <span><em>Site In Development</em> &mdash; Content is being actively updated</span>
+    <div class="dev-banner-pip"></div>
+  </div>
 
   <!-- NAV -->
   <nav>
@@ -1014,7 +1088,7 @@
     </div>
   </section>
 
-  <!-- HOW TO PLAY -->
+  <!-- FEATURES -->
   <div class="divider"></div>
   <section class="features">
     <div class="container">
@@ -1027,90 +1101,46 @@
           <div class="feature-number">01</div>
           <div class="feature-icon">
             <svg viewBox="0 0 48 48" fill="none">
-              <rect x="6" y="4" width="24" height="34" rx="2" stroke="#00f5ff" stroke-width="1.5"/>
-              <rect x="18" y="10" width="24" height="34" rx="2" stroke="#00f5ff" stroke-width="1.5" opacity="0.5"/>
-              <path d="M12 14h12M12 20h12M12 26h8" stroke="#00f5ff" stroke-width="1.5" stroke-linecap="round"/>
+              <rect x="4" y="8" width="40" height="32" rx="2" stroke="#00f5ff" stroke-width="1.5"/>
+              <path d="M4 16h40M16 8v8M32 8v8" stroke="#00f5ff" stroke-width="1.5"/>
+              <rect x="10" y="22" width="10" height="12" rx="1" fill="rgba(0,245,255,0.2)" stroke="#00f5ff" stroke-width="1"/>
+              <rect x="24" y="22" width="14" height="6" rx="1" fill="rgba(0,245,255,0.1)" stroke="#00f5ff" stroke-width="1"/>
+              <rect x="24" y="32" width="14" height="2" rx="1" fill="rgba(0,245,255,0.3)"/>
             </svg>
           </div>
           <h3>Build Your Deck</h3>
-          <p>Construct a minimum 60-card deck around your chosen Leader. Your Leader's faction determines which cards are legal — only cards from their faction plus neutral Free Agents are allowed. Max 3 copies of any card.</p>
+          <p>Construct a 40-card deck from your chosen syndicate's arsenal. Every card tells a story and changes the battlefield.</p>
         </div>
         <div class="feature-item">
           <div class="feature-number">02</div>
           <div class="feature-icon">
             <svg viewBox="0 0 48 48" fill="none">
-              <rect x="4" y="10" width="18" height="28" rx="2" stroke="#ff006e" stroke-width="1.5"/>
-              <rect x="26" y="10" width="18" height="28" rx="2" stroke="#ff006e" stroke-width="1.5"/>
-              <path d="M13 24h22" stroke="#ff006e" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="3 3"/>
-              <circle cx="13" cy="24" r="3" fill="#ff006e"/>
-              <circle cx="35" cy="24" r="3" stroke="#ff006e" stroke-width="1.5"/>
+              <circle cx="24" cy="24" r="18" stroke="#ff006e" stroke-width="1.5"/>
+              <path d="M24 6v4M24 38v4M6 24h4M38 24h4" stroke="#ff006e" stroke-width="1.5"/>
+              <circle cx="24" cy="24" r="8" stroke="#ff006e" stroke-width="1.5"/>
+              <path d="M20 24l3 3 6-6" stroke="#ff006e" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
           </div>
-          <h3>Spend Tech Points</h3>
-          <p>Each turn you gain Tech Points equal to your Tech Level. Spend them to deploy Units, play Hacks, attach Programs, or add Upgrades. Unspent points carry over — save up for your biggest plays.</p>
+          <h3>Control the Zones</h3>
+          <p>Capture districts across the Nexus map. Area control isn't just strategic — it's survival in this city.</p>
         </div>
         <div class="feature-item">
           <div class="feature-number">03</div>
           <div class="feature-icon">
             <svg viewBox="0 0 48 48" fill="none">
-              <path d="M8 38L24 10L40 38H8Z" stroke="#ffe600" stroke-width="1.5"/>
-              <path d="M24 20v10" stroke="#ffe600" stroke-width="2" stroke-linecap="round"/>
-              <circle cx="24" cy="34" r="2" fill="#ffe600"/>
-              <path d="M16 38h16" stroke="#ffe600" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M24 4L44 40H4L24 4Z" stroke="#ffe600" stroke-width="1.5"/>
+              <path d="M24 16v12M24 32v4" stroke="#ffe600" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M14 40h20" stroke="#ffe600" stroke-width="1.5"/>
             </svg>
           </div>
-          <h3>Destroy the Leader</h3>
-          <p>Win by reducing your opponent's Leader HP to zero through combat, or force them to draw from an empty deck. Units with Taunt must be attacked first — clear the board before going for the Leader directly.</p>
+          <h3>Trigger Events</h3>
+          <p>Event cards shift the power balance mid-game. The Nexus is unpredictable — adapt or fall behind.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- CARD TYPES -->
-  <div class="divider"></div>
-  <section class="features" style="padding-top: 80px; padding-bottom: 80px;">
-    <div class="container">
-      <div class="features-header">
-        <p class="section-label" style="justify-content: center;">The Cards</p>
-        <h2 class="section-title">Five Types. One Battlefield.</h2>
-      </div>
-      <div class="features-grid" style="grid-template-columns: repeat(5, 1fr);">
-
-        <div class="feature-item" style="border-top: 2px solid var(--magenta);">
-          <div class="feature-number" style="-webkit-text-stroke-color: rgba(255,0,110,0.15);">L</div>
-          <h3 style="color: var(--magenta);">Leader</h3>
-          <p>Your champion. Starts in play, defines your faction, and sets your starting Tech Level. If their HP hits zero — you lose.</p>
-        </div>
-
-        <div class="feature-item" style="border-top: 2px solid var(--cyan);">
-          <div class="feature-number" style="-webkit-text-stroke-color: rgba(0,245,255,0.15);">U</div>
-          <h3 style="color: var(--cyan);">Unit</h3>
-          <p>Fighters deployed to your Server. They attack with their ATK stat and survive until their HP hits zero. Damage sticks between turns.</p>
-        </div>
-
-        <div class="feature-item" style="border-top: 2px solid var(--yellow);">
-          <div class="feature-number" style="-webkit-text-stroke-color: rgba(255,230,0,0.15);">H</div>
-          <h3 style="color: var(--yellow);">Hack</h3>
-          <p>Instant-speed cards playable at any time — even on your opponent's turn. They stack and resolve last-in-first-out via the Priority system.</p>
-        </div>
-
-        <div class="feature-item" style="border-top: 2px solid #a855f7;">
-          <div class="feature-number" style="-webkit-text-stroke-color: rgba(168,85,247,0.15);">P</div>
-          <h3 style="color: #a855f7;">Program</h3>
-          <p>Attach to your Leader to raise your Tech Level and gain more resources each turn. Max 2 Programs at once — a third replaces one.</p>
-        </div>
-
-        <div class="feature-item" style="border-top: 2px solid var(--green);">
-          <div class="feature-number" style="-webkit-text-stroke-color: rgba(34,197,94,0.15);">G</div>
-          <h3 style="color: var(--green);">Upgrade</h3>
-          <p>Attach to a Unit to enhance its stats or grant new abilities. Each Unit holds 1 Upgrade at a time unless its card text says otherwise.</p>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- CARDS PREVIEW — real images from the catalog -->
+  <!-- CARDS PREVIEW -->
   <div class="divider"></div>
   <section class="cards-preview">
     <div class="container">
@@ -1123,69 +1153,88 @@
       </div>
 
       <div class="card-stack">
-        <!-- Kazuki — Neon Ninjas Leader -->
-        <div class="tcg-card" style="padding:0; background:transparent; border:none; box-shadow:none; flex-shrink:0; width:180px;">
-          <img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/0928b7c2-a194-429b-b7cf-982d1473e079/222Kazuki.png"
-               style="width:100%; display:block; border:1px solid rgba(56,189,248,0.2); transition: transform .25s, box-shadow .25s;"
-               onmouseover="this.style.transform='translateY(-8px)';this.style.boxShadow='0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(56,189,248,0.3)'"
-               onmouseout="this.style.transform='';this.style.boxShadow=''"
-               alt="Kazuki — Neon Ninjas"/>
+        <!-- Data Drakes -->
+        <div class="tcg-card">
+          <div class="tcg-card-art" style="--art-from: rgba(168,85,247,0.4); --art-to: rgba(40,0,80,0.9);">🐉</div>
+          <div class="tcg-card-body">
+            <div class="tcg-card-name">Drake Archivist</div>
+            <div class="tcg-card-type">Data Drakes · Specialist</div>
+            <div class="tcg-card-stats">
+              <div class="tcg-stat"><div class="tcg-stat-val">4</div><div class="tcg-stat-label">PWR</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">7</div><div class="tcg-stat-label">DEF</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">3</div><div class="tcg-stat-label">SPD</div></div>
+            </div>
+          </div>
         </div>
-        <!-- Nyla — Digital Dragonlords Leader -->
-        <div class="tcg-card" style="padding:0; background:transparent; border:none; box-shadow:none; flex-shrink:0; width:180px;">
-          <img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/ae935ec8-d90f-4a27-a177-001ff5c2c2ca/021Nyla.png"
-               style="width:100%; display:block; border:1px solid rgba(168,85,247,0.2); transition: transform .25s, box-shadow .25s;"
-               onmouseover="this.style.transform='translateY(-8px)';this.style.boxShadow='0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(168,85,247,0.3)'"
-               onmouseout="this.style.transform='';this.style.boxShadow=''"
-               alt="Nyla — Digital Dragonlords"/>
+
+        <!-- Neon Ninjas -->
+        <div class="tcg-card">
+          <div class="tcg-card-art" style="--art-from: rgba(56,189,248,0.4); --art-to: rgba(0,30,60,0.9);">🥷</div>
+          <div class="tcg-card-body">
+            <div class="tcg-card-name">Shadow Blade</div>
+            <div class="tcg-card-type">Neon Ninjas · Operative</div>
+            <div class="tcg-card-stats">
+              <div class="tcg-stat"><div class="tcg-stat-val">6</div><div class="tcg-stat-label">PWR</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">2</div><div class="tcg-stat-label">DEF</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">9</div><div class="tcg-stat-label">SPD</div></div>
+            </div>
+          </div>
         </div>
-        <!-- Lucia — Techno Templars Leader -->
-        <div class="tcg-card" style="padding:0; background:transparent; border:none; box-shadow:none; flex-shrink:0; width:180px;">
-          <img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/70bf9e63-0154-4b85-aa05-4ddfdfb0ea3c/1Lucia.png"
-               style="width:100%; display:block; border:1px solid rgba(34,197,94,0.2); transition: transform .25s, box-shadow .25s;"
-               onmouseover="this.style.transform='translateY(-8px)';this.style.boxShadow='0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(34,197,94,0.3)'"
-               onmouseout="this.style.transform='';this.style.boxShadow=''"
-               alt="Lucia — Techno Templars"/>
+
+        <!-- Quantum Quorum -->
+        <div class="tcg-card">
+          <div class="tcg-card-art" style="--art-from: rgba(239,68,68,0.4); --art-to: rgba(80,0,0,0.9);">⚛️</div>
+          <div class="tcg-card-body">
+            <div class="tcg-card-name">Quorum Theorist</div>
+            <div class="tcg-card-type">Quantum Quorum · Unit</div>
+            <div class="tcg-card-stats">
+              <div class="tcg-stat"><div class="tcg-stat-val">8</div><div class="tcg-stat-label">PWR</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">3</div><div class="tcg-stat-label">DEF</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">4</div><div class="tcg-stat-label">SPD</div></div>
+            </div>
+          </div>
         </div>
-        <!-- Card 010 — Neon Ninjas Unit -->
-        <div class="tcg-card" style="padding:0; background:transparent; border:none; box-shadow:none; flex-shrink:0; width:180px;">
-          <img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/f8272c69-001c-4fda-9c75-e8619c1078e3/010.png"
-               style="width:100%; display:block; border:1px solid rgba(56,189,248,0.2); transition: transform .25s, box-shadow .25s;"
-               onmouseover="this.style.transform='translateY(-8px)';this.style.boxShadow='0 20px 40px rgba(0,0,0,0.6)'"
-               onmouseout="this.style.transform='';this.style.boxShadow=''"
-               alt="Neon Ninjas card"/>
+
+        <!-- Techno Templars -->
+        <div class="tcg-card">
+          <div class="tcg-card-art" style="--art-from: rgba(34,197,94,0.4); --art-to: rgba(0,40,10,0.9);">⚔️</div>
+          <div class="tcg-card-body">
+            <div class="tcg-card-name">Iron Paladin</div>
+            <div class="tcg-card-type">Techno Templars · Guardian</div>
+            <div class="tcg-card-stats">
+              <div class="tcg-stat"><div class="tcg-stat-val">5</div><div class="tcg-stat-label">PWR</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">8</div><div class="tcg-stat-label">DEF</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">3</div><div class="tcg-stat-label">SPD</div></div>
+            </div>
+          </div>
         </div>
-        <!-- Card 048 — Digital Dragonlords Unit -->
-        <div class="tcg-card" style="padding:0; background:transparent; border:none; box-shadow:none; flex-shrink:0; width:180px;">
-          <img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/54367e13-0ada-4358-9c2b-46de601b6832/048.png"
-               style="width:100%; display:block; border:1px solid rgba(168,85,247,0.2); transition: transform .25s, box-shadow .25s;"
-               onmouseover="this.style.transform='translateY(-8px)';this.style.boxShadow='0 20px 40px rgba(0,0,0,0.6)'"
-               onmouseout="this.style.transform='';this.style.boxShadow=''"
-               alt="Digital Dragonlords card"/>
+
+        <!-- Free Agent -->
+        <div class="tcg-card">
+          <div class="tcg-card-art" style="--art-from: rgba(245,158,11,0.35); --art-to: rgba(60,30,0,0.9);">🃏</div>
+          <div class="tcg-card-body">
+            <div class="tcg-card-name">Street Mercenary</div>
+            <div class="tcg-card-type">Free Agents · Neutral</div>
+            <div class="tcg-card-stats">
+              <div class="tcg-stat"><div class="tcg-stat-val">5</div><div class="tcg-stat-label">PWR</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">5</div><div class="tcg-stat-label">DEF</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">5</div><div class="tcg-stat-label">SPD</div></div>
+            </div>
+          </div>
         </div>
-        <!-- Card 016 — Techno Templars Unit -->
-        <div class="tcg-card" style="padding:0; background:transparent; border:none; box-shadow:none; flex-shrink:0; width:180px;">
-          <img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/a44315b4-cce2-4875-b606-956d442d9225/016.png"
-               style="width:100%; display:block; border:1px solid rgba(34,197,94,0.2); transition: transform .25s, box-shadow .25s;"
-               onmouseover="this.style.transform='translateY(-8px)';this.style.boxShadow='0 20px 40px rgba(0,0,0,0.6)'"
-               onmouseout="this.style.transform='';this.style.boxShadow=''"
-               alt="Techno Templars card"/>
-        </div>
-        <!-- Card 099 — Quantum Quorum -->
-        <div class="tcg-card" style="padding:0; background:transparent; border:none; box-shadow:none; flex-shrink:0; width:180px;">
-          <img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/62375c0d-44f0-470c-94fa-5aae45a6e6c8/099.png"
-               style="width:100%; display:block; border:1px solid rgba(239,68,68,0.2); transition: transform .25s, box-shadow .25s;"
-               onmouseover="this.style.transform='translateY(-8px)';this.style.boxShadow='0 20px 40px rgba(0,0,0,0.6)'"
-               onmouseout="this.style.transform='';this.style.boxShadow=''"
-               alt="Quantum Quorum card"/>
-        </div>
-        <!-- Card 152 — Neon Ninjas Hack/Upgrade -->
-        <div class="tcg-card" style="padding:0; background:transparent; border:none; box-shadow:none; flex-shrink:0; width:180px;">
-          <img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/a254cc25-4b7c-44d4-9bd8-7315cc5ab1f3/152.png"
-               style="width:100%; display:block; border:1px solid rgba(56,189,248,0.2); transition: transform .25s, box-shadow .25s;"
-               onmouseover="this.style.transform='translateY(-8px)';this.style.boxShadow='0 20px 40px rgba(0,0,0,0.6)'"
-               onmouseout="this.style.transform='';this.style.boxShadow=''"
-               alt="Neon Ninjas card"/>
+
+        <!-- Event Card -->
+        <div class="tcg-card">
+          <div class="tcg-card-art" style="--art-from: rgba(0,245,255,0.2); --art-to: rgba(168,85,247,0.25);">💥</div>
+          <div class="tcg-card-body">
+            <div class="tcg-card-name">Neon Surge</div>
+            <div class="tcg-card-type">All Factions · Event</div>
+            <div class="tcg-card-stats">
+              <div class="tcg-stat"><div class="tcg-stat-val">—</div><div class="tcg-stat-label">PWR</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">—</div><div class="tcg-stat-label">DEF</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">—</div><div class="tcg-stat-label">SPD</div></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1196,10 +1245,10 @@
     <div class="container">
       <div class="cta-inner">
         <h2>The Nexus<br/><em>Awaits You</em></h2>
-        <p>Play now on Tabletop Simulator — join the Discord and request access.</p>
+        <p>Back us on Kickstarter and be first into the city.</p>
         <div class="cta-actions">
-          <a href="https://discord.gg/UjmhvUgUZN" class="btn-primary">Play on Tabletop Sim</a>
-          <a href="/kickstarter/" class="btn-ghost">Back on Kickstarter</a>
+          <a href="/kickstarter/" class="btn-primary">Back on Kickstarter</a>
+          <a href="https://discord.gg/UjmhvUgUZN" class="btn-ghost">Join the Discord</a>
         </div>
       </div>
     </div>
@@ -1232,7 +1281,7 @@
         <div class="footer-nav">
           <h4>Navigate</h4>
           <ul>
-            <li><a href="https://www.neonnexustcg.com/">Home</a></li>
+            <li><a href="/">Home</a></li>
             <li><a href="/rules/">Rules</a></li>
             <li><a href="/cardcatalog/">Card Catalog</a></li>
             <li><a href="/updates/">Updates</a></li>
