@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Media — Neon Nexus TCG</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--cyan:#00f5ff;--magenta:#ff006e;--dark:#030610;--darker:#010308;--grid-color:rgba(0,245,255,0.05);--glow-cyan:0 0 20px rgba(0,245,255,0.6),0 0 60px rgba(0,245,255,0.2);--glow-magenta:0 0 20px rgba(255,0,110,0.6),0 0 60px rgba(255,0,110,0.2);}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--darker);color:#cdd9ff;font-family:'Rajdhani',sans-serif;font-size:16px;overflow-x:hidden;cursor:crosshair;}
+    body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.12) 2px,rgba(0,0,0,0.12) 4px);pointer-events:none;z-index:9999;}
+    .grid-bg{position:fixed;inset:0;background-image:linear-gradient(var(--grid-color) 1px,transparent 1px),linear-gradient(90deg,var(--grid-color) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;}
+    nav{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:70px;background:linear-gradient(180deg,rgba(3,6,16,0.98) 0%,rgba(3,6,16,0.8) 100%);border-bottom:1px solid rgba(0,245,255,0.15);backdrop-filter:blur(12px);}
+    .nav-logo{font-family:'Orbitron',monospace;font-weight:900;font-size:1.2rem;letter-spacing:.15em;color:var(--cyan);text-shadow:var(--glow-cyan);text-decoration:none;}
+    .nav-logo span{color:var(--magenta);}
+    .nav-links{display:flex;gap:28px;list-style:none;align-items:center;}
+    .nav-links a{font-family:'Share Tech Mono',monospace;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(205,217,255,0.6);text-decoration:none;transition:color .2s;position:relative;}
+    .nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--cyan);transition:width .3s;}
+    .nav-links a:hover,.nav-links a.active{color:var(--cyan);}
+    .nav-links a:hover::after,.nav-links a.active::after{width:100%;}
+    .nav-cta{font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dark);background:var(--magenta);padding:8px 20px;text-decoration:none;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:background .2s;}
+    .nav-cta:hover{background:#ff3d8a;}
+
+    .page-top{padding-top:70px;position:relative;z-index:1;}
+    .page-hero{padding:70px 60px 50px;border-bottom:1px solid rgba(0,245,255,0.08);}
+    .page-eyebrow{font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.4em;text-transform:uppercase;color:var(--magenta);margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+    .page-eyebrow::before{content:'//';opacity:.5;}
+    .page-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(2rem,5vw,3.2rem);line-height:1;color:#fff;margin-bottom:16px;}
+    .page-desc{font-size:1.05rem;line-height:1.7;color:rgba(205,217,255,0.6);max-width:560px;}
+
+    /* CONTENT */
+    .media-body{max-width:1100px;padding:80px 60px 120px;position:relative;z-index:1;}
+
+    /* SECTION HEADER */
+    .media-section{margin-bottom:80px;}
+    .media-section-head{display:flex;align-items:center;gap:16px;margin-bottom:36px;}
+    .media-section-head .label{font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:var(--cyan);}
+    .media-section-head h2{font-family:'Orbitron',monospace;font-weight:700;font-size:1.2rem;color:#fff;}
+    .media-section-head .line{flex:1;height:1px;background:linear-gradient(90deg,rgba(0,245,255,0.2),transparent);}
+
+    /* FEATURED VIDEO */
+    .featured-video{position:relative;background:rgba(10,15,46,0.5);border:1px solid rgba(0,245,255,0.12);overflow:hidden;clip-path:polygon(0 0,calc(100% - 24px) 0,100% 24px,100% 100%,0 100%);}
+    .video-thumb-wrap{position:relative;cursor:pointer;}
+    .video-thumb{width:100%;display:block;aspect-ratio:16/9;object-fit:cover;opacity:.7;transition:opacity .3s;}
+    .video-thumb-wrap:hover .video-thumb{opacity:1;}
+    .play-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);transition:background .3s;}
+    .video-thumb-wrap:hover .play-overlay{background:rgba(0,0,0,0.1);}
+    .play-btn{width:72px;height:72px;background:rgba(0,245,255,0.15);border:2px solid var(--cyan);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .3s;box-shadow:var(--glow-cyan);}
+    .video-thumb-wrap:hover .play-btn{background:var(--cyan);box-shadow:0 0 40px var(--cyan);}
+    .play-btn svg{width:28px;height:28px;fill:var(--cyan);margin-left:4px;transition:fill .3s;}
+    .video-thumb-wrap:hover .play-btn svg{fill:var(--dark);}
+    .video-meta{padding:28px 32px;}
+    .video-tag{font-family:'Share Tech Mono',monospace;font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--magenta);border:1px solid rgba(255,0,110,0.25);padding:3px 10px;clip-path:polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%);display:inline-block;margin-bottom:12px;}
+    .video-title{font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;color:#fff;margin-bottom:8px;}
+    .video-desc{font-size:.95rem;color:rgba(205,217,255,0.55);line-height:1.65;}
+    .video-link{display:inline-flex;align-items:center;gap:8px;margin-top:16px;font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cyan);text-decoration:none;transition:opacity .2s;}
+    .video-link:hover{opacity:.7;}
+
+    /* YOUTUBE CTA */
+    .yt-cta{background:rgba(255,0,0,0.06);border:1px solid rgba(255,0,0,0.15);padding:36px 40px;clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,20px 100%,0 calc(100% - 20px));display:flex;align-items:center;justify-content:space-between;gap:24px;}
+    .yt-cta-text strong{font-family:'Orbitron',monospace;font-size:1rem;color:#fff;display:block;margin-bottom:8px;}
+    .yt-cta-text p{font-size:.95rem;color:rgba(205,217,255,0.55);}
+    .btn-yt{font-family:'Share Tech Mono',monospace;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:#fff;background:#ff0000;padding:12px 28px;text-decoration:none;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:all .2s;flex-shrink:0;}
+    .btn-yt:hover{background:#ff3333;box-shadow:0 0 20px rgba(255,0,0,0.4);}
+
+    /* COMING SOON */
+    .coming-soon-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+    .cs-card{background:rgba(10,15,46,0.3);border:1px dashed rgba(0,245,255,0.1);padding:40px 28px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);min-height:200px;}
+    .cs-icon{font-size:2rem;opacity:.3;margin-bottom:16px;}
+    .cs-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:rgba(205,217,255,0.25);}
+
+    .site-footer{position:relative;z-index:1;border-top:1px solid rgba(0,245,255,0.08);padding:60px;}
+    .footer-inner{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px;}
+    .footer-brand p{font-size:.9rem;color:rgba(205,217,255,0.35);line-height:1.65;margin-top:14px;max-width:220px;}
+    .footer-col h4{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--cyan);margin-bottom:18px;}
+    .footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
+    .footer-col a{font-size:.9rem;color:rgba(205,217,255,0.45);text-decoration:none;transition:color .2s;}
+    .footer-col a:hover{color:#fff;}
+    .footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:32px;border-top:1px solid rgba(255,255,255,0.05);}
+    .footer-bottom p{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:rgba(205,217,255,0.2);}
+    .status-badge{display:flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:rgba(205,217,255,0.3);}
+    .status-dot{width:6px;height:6px;border-radius:50%;background:#00ff88;box-shadow:0 0 8px #00ff88;animation:pulse 2s ease-in-out infinite;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    @media(max-width:900px){nav{padding:0 20px;}.nav-links{display:none;}.page-hero,.media-body{padding-left:24px;padding-right:24px;}.coming-soon-grid{grid-template-columns:1fr;}.yt-cta{flex-direction:column;}.footer-inner{grid-template-columns:1fr 1fr;}.site-footer{padding:40px 20px;}}
+  </style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<nav>
+  <a href="/" class="nav-logo">NEON<span>.</span>NEXUS</a>
+  <ul class="nav-links">
+    <li><a href="/rules/">Rules</a></li>
+    <li><a href="/cardcatalog/">Card Catalog</a></li>
+    <li><a href="/updates/">Updates</a></li>
+    <li><a href="/media/" class="active">Media</a></li>
+    <li><a href="https://discord.gg/UjmhvUgUZN">Discord</a></li>
+  </ul>
+  <a href="/kickstarter/" class="nav-cta">Kickstarter</a>
+</nav>
+
+<div class="page-top">
+  <div class="page-hero">
+    <p class="page-eyebrow">Video &amp; More</p>
+    <h1 class="page-title">Media</h1>
+    <p class="page-desc">Videos, previews, and coverage of Neon Nexus. Follow along as the game evolves from prototype to physical product.</p>
+  </div>
+
+  <div class="media-body">
+
+    <!-- YOUTUBE -->
+    <div class="media-section">
+      <div class="media-section-head">
+        <span class="label">// 01</span>
+        <h2>YouTube</h2>
+        <div class="line"></div>
+      </div>
+
+      <!-- Featured video -->
+      <div class="featured-video" style="margin-bottom:24px;">
+        <a href="https://www.youtube.com/@NeonNexusTCG" target="_blank" class="video-thumb-wrap">
+          <img class="video-thumb" src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/1d4a0015-c4a6-4964-a68f-0f7c94e79ce9/image_2023-10-23_123932672.png" alt="Neon Nexus First Look"/>
+          <div class="play-overlay">
+            <div class="play-btn">
+              <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+            </div>
+          </div>
+        </a>
+        <div class="video-meta">
+          <span class="video-tag">First Look</span>
+          <div class="video-title">Neon Nexus TCG — First Look</div>
+          <p class="video-desc">An early look at Neon Nexus and some of the different card types. Note: this was recorded before the visual overhaul — card art and layout have been updated, but all mechanics and types are the same.</p>
+          <a href="https://www.youtube.com/@NeonNexusTCG" target="_blank" class="video-link">Watch on YouTube →</a>
+        </div>
+      </div>
+
+      <!-- YouTube subscribe CTA -->
+      <div class="yt-cta">
+        <div class="yt-cta-text">
+          <strong>Subscribe on YouTube</strong>
+          <p>New gameplay videos, card reveals, and dev diary content posted to the Neon Nexus YouTube channel. Subscribe to stay current.</p>
+        </div>
+        <a href="https://www.youtube.com/@NeonNexusTCG" target="_blank" class="btn-yt">Subscribe →</a>
+      </div>
+    </div>
+
+    <!-- MORE MEDIA COMING SOON -->
+    <div class="media-section">
+      <div class="media-section-head">
+        <span class="label">// 02</span>
+        <h2>More Coming Soon</h2>
+        <div class="line"></div>
+      </div>
+      <div class="coming-soon-grid">
+        <div class="cs-card">
+          <div class="cs-icon">🎮</div>
+          <div class="cs-label">Gameplay Footage</div>
+        </div>
+        <div class="cs-card">
+          <div class="cs-icon">🃏</div>
+          <div class="cs-label">Card Reveal Videos</div>
+        </div>
+        <div class="cs-card">
+          <div class="cs-icon">🖥️</div>
+          <div class="cs-label">Dev Diary Series</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand footer-col">
+      <a href="/" class="nav-logo">NEON<span>.</span>NEXUS</a>
+      <p>A cyberpunk TCG where five factions battle for control of the city. Your moves. Their fate.</p>
+    </div>
+    <div class="footer-col"><h4>Navigate</h4><ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/rules/">Rules</a></li>
+      <li><a href="/cardcatalog/">Card Catalog</a></li>
+      <li><a href="/updates/">Updates</a></li>
+      <li><a href="/kickstarter/">Kickstarter</a></li>
+      <li><a href="/media/">Media</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Community</h4><ul>
+      <li><a href="https://discord.gg/UjmhvUgUZN">Discord</a></li>
+      <li><a href="https://www.youtube.com/@NeonNexusTCG">YouTube</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Factions</h4><ul>
+      <li><a href="/cardcatalog/#drakes" style="color:rgba(168,85,247,0.7)">Digital Dragonlords</a></li>
+      <li><a href="/cardcatalog/#ninjas" style="color:rgba(56,189,248,0.7)">Neon Ninjas</a></li>
+      <li><a href="/cardcatalog/#quorum" style="color:rgba(239,68,68,0.7)">Quantum Quorum</a></li>
+      <li><a href="/cardcatalog/#templars" style="color:rgba(34,197,94,0.7)">Techno Templars</a></li>
+      <li><a href="/cardcatalog/#free" style="color:rgba(245,158,11,0.7)">Free Agents</a></li>
+    </ul></div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2024 NEON NEXUS TCG — ALL RIGHTS RESERVED</p>
+    <div class="status-badge"><div class="status-dot"></div>DEVELOPMENT ACTIVE</div>
+  </div>
+</footer>
+</body>
+</html>
