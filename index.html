@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neon Nexus TCG</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --cyan: #00f5ff;
+      --magenta: #ff006e;
+      --yellow: #ffe600;
+      --dark: #030610;
+      --darker: #010308;
+      --mid: #0a0f2e;
+      --grid-color: rgba(0, 245, 255, 0.06);
+      --glow-cyan: 0 0 20px rgba(0,245,255,0.6), 0 0 60px rgba(0,245,255,0.2);
+      --glow-magenta: 0 0 20px rgba(255,0,110,0.6), 0 0 60px rgba(255,0,110,0.2);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--darker);
+      color: #cdd9ff;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 16px;
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    /* ── SCANLINE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.15) 2px,
+        rgba(0,0,0,0.15) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ── GRID BG ── */
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      height: 70px;
+      background: linear-gradient(180deg, rgba(3,6,16,0.98) 0%, rgba(3,6,16,0.8) 100%);
+      border-bottom: 1px solid rgba(0,245,255,0.15);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav-logo {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      font-size: 1.2rem;
+      letter-spacing: 0.15em;
+      color: var(--cyan);
+      text-shadow: var(--glow-cyan);
+      text-decoration: none;
+    }
+
+    .nav-logo span { color: var(--magenta); }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(205,217,255,0.6);
+      text-decoration: none;
+      transition: color 0.2s, text-shadow 0.2s;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--cyan);
+      transition: width 0.3s;
+      box-shadow: var(--glow-cyan);
+    }
+
+    .nav-links a:hover {
+      color: var(--cyan);
+    }
+
+    .nav-links a:hover::after { width: 100%; }
+
+    .nav-cta {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--dark);
+      background: var(--magenta);
+      padding: 8px 20px;
+      text-decoration: none;
+      clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+
+    .nav-cta:hover {
+      background: #ff3d8a;
+      box-shadow: var(--glow-magenta);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 120px 40px 80px;
+      overflow: hidden;
+    }
+
+    /* animated glow orbs */
+    .hero::before, .hero::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+    }
+
+    .hero::before {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(0,245,255,0.12) 0%, transparent 70%);
+      top: 10%;
+      left: -100px;
+      animation: drift1 8s ease-in-out infinite alternate;
+    }
+
+    .hero::after {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(255,0,110,0.12) 0%, transparent 70%);
+      bottom: 10%;
+      right: -80px;
+      animation: drift2 10s ease-in-out infinite alternate;
+    }
+
+    @keyframes drift1 {
+      from { transform: translate(0, 0); }
+      to   { transform: translate(60px, 40px); }
+    }
+    @keyframes drift2 {
+      from { transform: translate(0, 0); }
+      to   { transform: translate(-40px, -60px); }
+    }
+
+    .hero-eyebrow {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--magenta);
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 1;
+      animation: fadeUp 0.8s ease both;
+    }
+
+    .hero-eyebrow::before, .hero-eyebrow::after {
+      content: '//';
+      opacity: 0.4;
+      margin: 0 12px;
+    }
+
+    .hero-title {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      font-size: clamp(3.5rem, 10vw, 8rem);
+      line-height: 0.9;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      animation: fadeUp 0.8s 0.15s ease both;
+    }
+
+    .hero-title .line1 {
+      display: block;
+      color: #fff;
+      text-shadow: 0 0 80px rgba(0,245,255,0.3);
+    }
+
+    .hero-title .line2 {
+      display: block;
+      color: transparent;
+      -webkit-text-stroke: 2px var(--cyan);
+      text-shadow: var(--glow-cyan);
+      position: relative;
+    }
+
+    /* glitch effect */
+    .hero-title .line2::before {
+      content: 'NEXUS';
+      position: absolute;
+      left: 0; right: 0;
+      color: var(--magenta);
+      -webkit-text-stroke: 2px var(--magenta);
+      opacity: 0;
+      animation: glitch 5s infinite;
+      clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%);
+    }
+
+    @keyframes glitch {
+      0%, 92%, 100% { opacity: 0; transform: translateX(0); }
+      93% { opacity: 0.7; transform: translateX(-6px); }
+      95% { opacity: 0.7; transform: translateX(6px); }
+      97% { opacity: 0; transform: translateX(0); }
+    }
+
+    .hero-sub {
+      margin-top: 32px;
+      font-size: 1.15rem;
+      font-weight: 300;
+      line-height: 1.7;
+      text-align: center;
+      max-width: 600px;
+      color: rgba(205,217,255,0.65);
+      position: relative;
+      z-index: 1;
+      animation: fadeUp 0.8s 0.3s ease both;
+    }
+
+    .hero-actions {
+      margin-top: 48px;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+      animation: fadeUp 0.8s 0.45s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── BUTTONS ── */
+    .btn-primary {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--dark);
+      background: var(--cyan);
+      padding: 14px 36px;
+      text-decoration: none;
+      clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+      transition: all 0.2s;
+      display: inline-block;
+      font-weight: 700;
+    }
+
+    .btn-primary:hover {
+      background: #fff;
+      box-shadow: var(--glow-cyan);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--magenta);
+      background: transparent;
+      border: 1px solid var(--magenta);
+      padding: 14px 36px;
+      text-decoration: none;
+      clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+      transition: all 0.2s;
+      display: inline-block;
+    }
+
+    .btn-outline:hover {
+      background: rgba(255,0,110,0.1);
+      box-shadow: var(--glow-magenta);
+      transform: translateY(-2px);
+    }
+
+    .btn-ghost {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(205,217,255,0.5);
+      background: transparent;
+      border: 1px solid rgba(205,217,255,0.15);
+      padding: 14px 36px;
+      text-decoration: none;
+      clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+      transition: all 0.2s;
+      display: inline-block;
+    }
+
+    .btn-ghost:hover {
+      color: #fff;
+      border-color: rgba(205,217,255,0.4);
+      transform: translateY(-2px);
+    }
+
+    /* ── SCROLL INDICATOR ── */
+    .scroll-hint {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      z-index: 1;
+    }
+
+    .scroll-hint span {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      color: rgba(205,217,255,0.3);
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 50px;
+      background: linear-gradient(180deg, var(--cyan), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; transform: scaleY(1); }
+      50% { opacity: 1; transform: scaleY(1.2); }
+    }
+
+    /* ── SECTION BASE ── */
+    section {
+      position: relative;
+      z-index: 1;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    .section-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-label::before {
+      content: '';
+      width: 30px;
+      height: 1px;
+      background: var(--cyan);
+      box-shadow: var(--glow-cyan);
+    }
+
+    .section-title {
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.1;
+      color: #fff;
+    }
+
+    /* ── LORE SECTION ── */
+    .lore {
+      padding: 120px 0;
+    }
+
+    .lore-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .lore-text p {
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: rgba(205,217,255,0.7);
+      margin-top: 24px;
+    }
+
+    .lore-visual {
+      position: relative;
+    }
+
+    .syndicates-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .syndicate-card {
+      background: rgba(10,15,46,0.8);
+      border: 1px solid rgba(0,245,255,0.1);
+      padding: 24px 20px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s, transform 0.3s;
+      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+    }
+
+    .syndicate-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--card-color, var(--cyan)) 0%, transparent 60%);
+      opacity: 0.05;
+      transition: opacity 0.3s;
+    }
+
+    .syndicate-card:hover {
+      border-color: var(--card-color, var(--cyan));
+      transform: translateY(-4px);
+    }
+
+    .syndicate-card:hover::before { opacity: 0.12; }
+
+    .syndicate-card .card-icon {
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+    }
+
+    .syndicate-card h3 {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--card-color, var(--cyan));
+      margin-bottom: 8px;
+    }
+
+    .syndicate-card p {
+      font-size: 0.85rem;
+      color: rgba(205,217,255,0.5);
+      line-height: 1.5;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan), var(--magenta), transparent);
+      opacity: 0.2;
+      margin: 0;
+    }
+
+    /* ── FEATURES SECTION ── */
+    .features {
+      padding: 120px 0;
+      background: linear-gradient(180deg, transparent, rgba(0,245,255,0.02) 50%, transparent);
+    }
+
+    .features-header {
+      text-align: center;
+      margin-bottom: 70px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      background: rgba(0,245,255,0.05);
+      border: 1px solid rgba(0,245,255,0.08);
+    }
+
+    .feature-item {
+      background: var(--darker);
+      padding: 48px 36px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+
+    .feature-item:hover {
+      background: rgba(10,15,46,0.9);
+    }
+
+    .feature-number {
+      font-family: 'Orbitron', monospace;
+      font-size: 3rem;
+      font-weight: 900;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(0,245,255,0.15);
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      line-height: 1;
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .feature-icon svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .feature-item h3 {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+      letter-spacing: 0.05em;
+    }
+
+    .feature-item p {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: rgba(205,217,255,0.55);
+    }
+
+    /* ── CARDS PREVIEW ── */
+    .cards-preview {
+      padding: 120px 0;
+    }
+
+    .cards-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 60px;
+    }
+
+    .card-stack {
+      display: flex;
+      gap: 24px;
+      overflow-x: auto;
+      padding-bottom: 20px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--cyan) transparent;
+    }
+
+    .card-stack::-webkit-scrollbar { height: 2px; }
+    .card-stack::-webkit-scrollbar-track { background: transparent; }
+    .card-stack::-webkit-scrollbar-thumb { background: var(--cyan); }
+
+    .tcg-card {
+      flex-shrink: 0;
+      width: 200px;
+      background: linear-gradient(135deg, #0a0f2e 0%, #050b20 100%);
+      border: 1px solid rgba(0,245,255,0.2);
+      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+
+    .tcg-card:hover {
+      transform: translateY(-12px) rotate(-1deg);
+      box-shadow: 0 20px 60px rgba(0,245,255,0.2);
+    }
+
+    .tcg-card-art {
+      width: 100%;
+      height: 140px;
+      background: linear-gradient(135deg, var(--art-from, #00f5ff22), var(--art-to, #ff006e22));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tcg-card-art::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 60%, #050b20 100%);
+    }
+
+    .tcg-card-body {
+      padding: 12px;
+    }
+
+    .tcg-card-name {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+    }
+
+    .tcg-card-type {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.55rem;
+      color: var(--cyan);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .tcg-card-stats {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(0,245,255,0.1);
+    }
+
+    .tcg-stat {
+      text-align: center;
+    }
+
+    .tcg-stat-val {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+
+    .tcg-stat-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.45rem;
+      color: rgba(205,217,255,0.3);
+      letter-spacing: 0.2em;
+    }
+
+    /* ── CTA BAND ── */
+    .cta-band {
+      padding: 100px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-band::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(0,245,255,0.06) 0%, transparent 50%, rgba(255,0,110,0.06) 100%);
+      border-top: 1px solid rgba(0,245,255,0.1);
+      border-bottom: 1px solid rgba(255,0,110,0.1);
+    }
+
+    .cta-inner {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-inner h2 {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+
+    .cta-inner h2 em {
+      font-style: normal;
+      color: var(--cyan);
+      text-shadow: var(--glow-cyan);
+    }
+
+    .cta-inner p {
+      color: rgba(205,217,255,0.6);
+      font-size: 1.1rem;
+      margin-bottom: 40px;
+    }
+
+    .cta-actions {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ── NEWSLETTER ── */
+    .newsletter {
+      padding: 80px 0;
+    }
+
+    .newsletter-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 60px;
+      padding: 48px 60px;
+      background: rgba(10,15,46,0.6);
+      border: 1px solid rgba(0,245,255,0.1);
+      clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 24px 100%, 0 calc(100% - 24px));
+    }
+
+    .newsletter-text h3 {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .newsletter-text p {
+      color: rgba(205,217,255,0.5);
+      font-size: 0.95rem;
+    }
+
+    .newsletter-form {
+      display: flex;
+      gap: 0;
+      flex-shrink: 0;
+    }
+
+    .newsletter-form input {
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(0,245,255,0.2);
+      border-right: none;
+      color: #fff;
+      padding: 12px 20px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem;
+      width: 260px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .newsletter-form input:focus {
+      border-color: var(--cyan);
+    }
+
+    .newsletter-form input::placeholder {
+      color: rgba(205,217,255,0.3);
+      letter-spacing: 0.15em;
+    }
+
+    .newsletter-form button {
+      background: var(--cyan);
+      border: none;
+      color: var(--dark);
+      padding: 12px 28px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-weight: 700;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+
+    .newsletter-form button:hover {
+      background: #fff;
+      box-shadow: var(--glow-cyan);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 60px 0 40px;
+      border-top: 1px solid rgba(0,245,255,0.08);
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 40px;
+      margin-bottom: 48px;
+    }
+
+    .footer-brand .nav-logo {
+      display: block;
+      margin-bottom: 16px;
+      font-size: 1rem;
+    }
+
+    .footer-brand p {
+      font-size: 0.85rem;
+      color: rgba(205,217,255,0.35);
+      max-width: 240px;
+      line-height: 1.6;
+    }
+
+    .footer-nav h4 {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 20px;
+    }
+
+    .footer-nav ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .footer-nav a {
+      font-size: 0.9rem;
+      color: rgba(205,217,255,0.45);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-nav a:hover { color: #fff; }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 32px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .footer-bottom p {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      color: rgba(205,217,255,0.2);
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      color: rgba(205,217,255,0.3);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #00ff88;
+      box-shadow: 0 0 8px #00ff88;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* ── DECORATIVE CORNER ── */
+    .corner-decor {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      pointer-events: none;
+    }
+    .corner-decor.tl { top: 20px; left: 20px; border-top: 1px solid var(--cyan); border-left: 1px solid var(--cyan); opacity: 0.3; }
+    .corner-decor.tr { top: 20px; right: 20px; border-top: 1px solid var(--cyan); border-right: 1px solid var(--cyan); opacity: 0.3; }
+    .corner-decor.bl { bottom: 20px; left: 20px; border-bottom: 1px solid var(--magenta); border-left: 1px solid var(--magenta); opacity: 0.3; }
+    .corner-decor.br { bottom: 20px; right: 20px; border-bottom: 1px solid var(--magenta); border-right: 1px solid var(--magenta); opacity: 0.3; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .container { padding: 0 20px; }
+      .lore-grid { grid-template-columns: 1fr; gap: 48px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .cards-header { flex-direction: column; align-items: flex-start; gap: 20px; }
+      .newsletter-inner { flex-direction: column; padding: 32px; }
+      .newsletter-form { flex-direction: column; }
+      .newsletter-form input { width: 100%; border-right: 1px solid rgba(0,245,255,0.2); border-bottom: none; }
+      .footer-inner { flex-direction: column; }
+      .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="/" class="nav-logo">NEON<span>.</span>NEXUS</a>
+    <ul class="nav-links">
+      <li><a href="/rules/">Rules</a></li>
+      <li><a href="/cardcatalog/">Card Catalog</a></li>
+      <li><a href="/updates/">Updates</a></li>
+      <li><a href="/media/">Media</a></li>
+      <li><a href="https://discord.gg/UjmhvUgUZN">Discord</a></li>
+    </ul>
+    <a href="/kickstarter/" class="nav-cta">Kickstarter</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="corner-decor tl"></div>
+    <div class="corner-decor tr"></div>
+    <div class="corner-decor bl"></div>
+    <div class="corner-decor br"></div>
+
+    <p class="hero-eyebrow">A Trading Card Game</p>
+    <h1 class="hero-title">
+      <span class="line1">NEON</span>
+      <span class="line2">NEXUS</span>
+    </h1>
+    <p class="hero-sub">
+      Four syndicates. One city. Infinite power plays. Step into a world where the bright lights of tomorrow cast the darkest shadows.
+    </p>
+    <div class="hero-actions">
+      <a href="/cardcatalog/" class="btn-primary">See the Cards</a>
+      <a href="/rules/" class="btn-outline">Learn to Play</a>
+      <a href="https://discord.gg/UjmhvUgUZN" class="btn-ghost">Join Discord</a>
+    </div>
+
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- LORE -->
+  <div class="divider"></div>
+  <section class="lore">
+    <div class="container">
+      <div class="lore-grid">
+        <div class="lore-text">
+          <p class="section-label">World of Nexus</p>
+          <h2 class="section-title">A City Alive<br/>With Power</h2>
+          <p>Welcome to Nexus — a vast cyberpunk cityscape where four titanic syndicates are locked in a relentless struggle for dominance. Every card you play, every strategy you deploy, rewrites the destiny of this world.</p>
+          <p>As a player, you don't just witness the war for Nexus — you are its architect. Build your deck, pick your syndicate, and make every move count.</p>
+          <div style="margin-top: 32px;">
+            <a href="/cardcatalog/" class="btn-outline">Browse the Cards</a>
+          </div>
+        </div>
+        <div class="lore-visual">
+          <div class="syndicates-grid">
+            <div class="syndicate-card" style="--card-color: #a855f7;">
+              <div class="card-icon">🐉</div>
+              <h3>Data Drakes</h3>
+              <p>Ancient power meets digital mastery. They hoard information like treasure and guard it with ferocity.</p>
+            </div>
+            <div class="syndicate-card" style="--card-color: #38bdf8;">
+              <div class="card-icon">🥷</div>
+              <h3>Neon Ninjas</h3>
+              <p>Swift, silent, and surgically precise. They strike from the shadows before their enemies even know they've lost.</p>
+            </div>
+            <div class="syndicate-card" style="--card-color: #ef4444;">
+              <div class="card-icon">⚛️</div>
+              <h3>Quantum Quorum</h3>
+              <p>Scientists and zealots who believe the future belongs to those who rewrite the laws of reality.</p>
+            </div>
+            <div class="syndicate-card" style="--card-color: #22c55e;">
+              <div class="card-icon">⚔️</div>
+              <h3>Techno Templars</h3>
+              <p>Holy warriors of the new age. They march under a digital creed and enforce order with iron and code.</p>
+            </div>
+            <div class="syndicate-card" style="--card-color: #f59e0b; grid-column: 1 / -1;">
+              <div class="card-icon">🃏</div>
+              <h3>Free Agents <span style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:rgba(205,217,255,0.4); font-weight:400; letter-spacing:0.2em;">· NEUTRAL</span></h3>
+              <p>Bound by no faction, loyal only to the highest bidder. Free Agents operate across all factions, bringing unpredictable power to any deck.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <div class="divider"></div>
+  <section class="features">
+    <div class="container">
+      <div class="features-header">
+        <p class="section-label" style="justify-content: center;">How It Works</p>
+        <h2 class="section-title">Built for Strategists</h2>
+      </div>
+      <div class="features-grid">
+        <div class="feature-item">
+          <div class="feature-number">01</div>
+          <div class="feature-icon">
+            <svg viewBox="0 0 48 48" fill="none">
+              <rect x="4" y="8" width="40" height="32" rx="2" stroke="#00f5ff" stroke-width="1.5"/>
+              <path d="M4 16h40M16 8v8M32 8v8" stroke="#00f5ff" stroke-width="1.5"/>
+              <rect x="10" y="22" width="10" height="12" rx="1" fill="rgba(0,245,255,0.2)" stroke="#00f5ff" stroke-width="1"/>
+              <rect x="24" y="22" width="14" height="6" rx="1" fill="rgba(0,245,255,0.1)" stroke="#00f5ff" stroke-width="1"/>
+              <rect x="24" y="32" width="14" height="2" rx="1" fill="rgba(0,245,255,0.3)"/>
+            </svg>
+          </div>
+          <h3>Build Your Deck</h3>
+          <p>Construct a 40-card deck from your chosen syndicate's arsenal. Every card tells a story and changes the battlefield.</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-number">02</div>
+          <div class="feature-icon">
+            <svg viewBox="0 0 48 48" fill="none">
+              <circle cx="24" cy="24" r="18" stroke="#ff006e" stroke-width="1.5"/>
+              <path d="M24 6v4M24 38v4M6 24h4M38 24h4" stroke="#ff006e" stroke-width="1.5"/>
+              <circle cx="24" cy="24" r="8" stroke="#ff006e" stroke-width="1.5"/>
+              <path d="M20 24l3 3 6-6" stroke="#ff006e" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3>Control the Zones</h3>
+          <p>Capture districts across the Nexus map. Area control isn't just strategic — it's survival in this city.</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-number">03</div>
+          <div class="feature-icon">
+            <svg viewBox="0 0 48 48" fill="none">
+              <path d="M24 4L44 40H4L24 4Z" stroke="#ffe600" stroke-width="1.5"/>
+              <path d="M24 16v12M24 32v4" stroke="#ffe600" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M14 40h20" stroke="#ffe600" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <h3>Trigger Events</h3>
+          <p>Event cards shift the power balance mid-game. The Nexus is unpredictable — adapt or fall behind.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CARDS PREVIEW -->
+  <div class="divider"></div>
+  <section class="cards-preview">
+    <div class="container">
+      <div class="cards-header">
+        <div>
+          <p class="section-label">The Collection</p>
+          <h2 class="section-title">Cards of the Nexus</h2>
+        </div>
+        <a href="/cardcatalog/" class="btn-outline">Full Catalog →</a>
+      </div>
+
+      <div class="card-stack">
+        <!-- Data Drakes -->
+        <div class="tcg-card">
+          <div class="tcg-card-art" style="--art-from: rgba(168,85,247,0.4); --art-to: rgba(40,0,80,0.9);">🐉</div>
+          <div class="tcg-card-body">
+            <div class="tcg-card-name">Drake Archivist</div>
+            <div class="tcg-card-type">Data Drakes · Specialist</div>
+            <div class="tcg-card-stats">
+              <div class="tcg-stat"><div class="tcg-stat-val">4</div><div class="tcg-stat-label">PWR</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">7</div><div class="tcg-stat-label">DEF</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">3</div><div class="tcg-stat-label">SPD</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Neon Ninjas -->
+        <div class="tcg-card">
+          <div class="tcg-card-art" style="--art-from: rgba(56,189,248,0.4); --art-to: rgba(0,30,60,0.9);">🥷</div>
+          <div class="tcg-card-body">
+            <div class="tcg-card-name">Shadow Blade</div>
+            <div class="tcg-card-type">Neon Ninjas · Operative</div>
+            <div class="tcg-card-stats">
+              <div class="tcg-stat"><div class="tcg-stat-val">6</div><div class="tcg-stat-label">PWR</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">2</div><div class="tcg-stat-label">DEF</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">9</div><div class="tcg-stat-label">SPD</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quantum Quorum -->
+        <div class="tcg-card">
+          <div class="tcg-card-art" style="--art-from: rgba(239,68,68,0.4); --art-to: rgba(80,0,0,0.9);">⚛️</div>
+          <div class="tcg-card-body">
+            <div class="tcg-card-name">Quorum Theorist</div>
+            <div class="tcg-card-type">Quantum Quorum · Unit</div>
+            <div class="tcg-card-stats">
+              <div class="tcg-stat"><div class="tcg-stat-val">8</div><div class="tcg-stat-label">PWR</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">3</div><div class="tcg-stat-label">DEF</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">4</div><div class="tcg-stat-label">SPD</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Techno Templars -->
+        <div class="tcg-card">
+          <div class="tcg-card-art" style="--art-from: rgba(34,197,94,0.4); --art-to: rgba(0,40,10,0.9);">⚔️</div>
+          <div class="tcg-card-body">
+            <div class="tcg-card-name">Iron Paladin</div>
+            <div class="tcg-card-type">Techno Templars · Guardian</div>
+            <div class="tcg-card-stats">
+              <div class="tcg-stat"><div class="tcg-stat-val">5</div><div class="tcg-stat-label">PWR</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">8</div><div class="tcg-stat-label">DEF</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">3</div><div class="tcg-stat-label">SPD</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Free Agent -->
+        <div class="tcg-card">
+          <div class="tcg-card-art" style="--art-from: rgba(245,158,11,0.35); --art-to: rgba(60,30,0,0.9);">🃏</div>
+          <div class="tcg-card-body">
+            <div class="tcg-card-name">Street Mercenary</div>
+            <div class="tcg-card-type">Free Agents · Neutral</div>
+            <div class="tcg-card-stats">
+              <div class="tcg-stat"><div class="tcg-stat-val">5</div><div class="tcg-stat-label">PWR</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">5</div><div class="tcg-stat-label">DEF</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">5</div><div class="tcg-stat-label">SPD</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Event Card -->
+        <div class="tcg-card">
+          <div class="tcg-card-art" style="--art-from: rgba(0,245,255,0.2); --art-to: rgba(168,85,247,0.25);">💥</div>
+          <div class="tcg-card-body">
+            <div class="tcg-card-name">Neon Surge</div>
+            <div class="tcg-card-type">All Factions · Event</div>
+            <div class="tcg-card-stats">
+              <div class="tcg-stat"><div class="tcg-stat-val">—</div><div class="tcg-stat-label">PWR</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">—</div><div class="tcg-stat-label">DEF</div></div>
+              <div class="tcg-stat"><div class="tcg-stat-val">—</div><div class="tcg-stat-label">SPD</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BAND -->
+  <section class="cta-band">
+    <div class="container">
+      <div class="cta-inner">
+        <h2>The Nexus<br/><em>Awaits You</em></h2>
+        <p>Back us on Kickstarter and be first into the city.</p>
+        <div class="cta-actions">
+          <a href="/kickstarter/" class="btn-primary">Back on Kickstarter</a>
+          <a href="https://discord.gg/UjmhvUgUZN" class="btn-ghost">Join the Discord</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEWSLETTER -->
+  <section class="newsletter">
+    <div class="container">
+      <div class="newsletter-inner">
+        <div class="newsletter-text">
+          <h3>Stay in the Loop</h3>
+          <p>New cards, updates, and Nexus lore — straight to your inbox.</p>
+        </div>
+        <div class="newsletter-form">
+          <input type="email" placeholder="your@email.com" />
+          <button type="button">Transmit</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <a href="/" class="nav-logo">NEON<span>.</span>NEXUS</a>
+          <p>A cyberpunk trading card game where five factions battle for control of the city. Your moves. Their fate.</p>
+        </div>
+        <div class="footer-nav">
+          <h4>Navigate</h4>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/rules/">Rules</a></li>
+            <li><a href="/cardcatalog/">Card Catalog</a></li>
+            <li><a href="/updates/">Updates</a></li>
+            <li><a href="/kickstarter/">Kickstarter</a></li>
+            <li><a href="/media/">Media</a></li>
+          </ul>
+        </div>
+        <div class="footer-nav">
+          <h4>Community</h4>
+          <ul>
+            <li><a href="https://discord.gg/UjmhvUgUZN">Discord</a></li>
+            <li><a href="/updates/">Dev Updates</a></li>
+          </ul>
+        </div>
+        <div class="footer-nav">
+          <h4>Factions</h4>
+          <ul>
+            <li><a href="/cardcatalog/" style="color: rgba(168,85,247,0.7);">Data Drakes</a></li>
+            <li><a href="/cardcatalog/" style="color: rgba(56,189,248,0.7);">Neon Ninjas</a></li>
+            <li><a href="/cardcatalog/" style="color: rgba(239,68,68,0.7);">Quantum Quorum</a></li>
+            <li><a href="/cardcatalog/" style="color: rgba(34,197,94,0.7);">Techno Templars</a></li>
+            <li><a href="/cardcatalog/" style="color: rgba(245,158,11,0.7);">Free Agents</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2024 NEON NEXUS TCG — ALL RIGHTS RESERVED</p>
+        <div class="status-badge">
+          <div class="status-dot"></div>
+          DEVELOPMENT ACTIVE
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

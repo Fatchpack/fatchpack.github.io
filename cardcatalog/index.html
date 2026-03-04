@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Card Catalog — Neon Nexus TCG</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--cyan:#00f5ff;--magenta:#ff006e;--yellow:#ffe600;--green:#22c55e;--purple:#a855f7;--blue:#38bdf8;--red:#ef4444;--amber:#f59e0b;--dark:#030610;--darker:#010308;--mid:#0a0f2e;--grid-color:rgba(0,245,255,0.05);--glow-cyan:0 0 20px rgba(0,245,255,0.6),0 0 60px rgba(0,245,255,0.2);--glow-magenta:0 0 20px rgba(255,0,110,0.6),0 0 60px rgba(255,0,110,0.2);}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{background:var(--darker);color:#cdd9ff;font-family:'Rajdhani',sans-serif;font-size:16px;overflow-x:hidden;cursor:crosshair;}
+    body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.12) 2px,rgba(0,0,0,0.12) 4px);pointer-events:none;z-index:9999;}
+    .grid-bg{position:fixed;inset:0;background-image:linear-gradient(var(--grid-color) 1px,transparent 1px),linear-gradient(90deg,var(--grid-color) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;}
+    nav{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:70px;background:linear-gradient(180deg,rgba(3,6,16,0.98) 0%,rgba(3,6,16,0.8) 100%);border-bottom:1px solid rgba(0,245,255,0.15);backdrop-filter:blur(12px);}
+    .nav-logo{font-family:'Orbitron',monospace;font-weight:900;font-size:1.2rem;letter-spacing:.15em;color:var(--cyan);text-shadow:var(--glow-cyan);text-decoration:none;}
+    .nav-logo span{color:var(--magenta);}
+    .nav-links{display:flex;gap:28px;list-style:none;align-items:center;}
+    .nav-links a{font-family:'Share Tech Mono',monospace;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(205,217,255,0.6);text-decoration:none;transition:color .2s;position:relative;}
+    .nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--cyan);transition:width .3s;}
+    .nav-links a:hover,.nav-links a.active{color:var(--cyan);}
+    .nav-links a:hover::after,.nav-links a.active::after{width:100%;}
+    .nav-cta{font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dark);background:var(--magenta);padding:8px 20px;text-decoration:none;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:background .2s,box-shadow .2s;}
+    .nav-cta:hover{background:#ff3d8a;box-shadow:var(--glow-magenta);}
+
+    /* PAGE HEADER */
+    .page-top{padding-top:70px;position:relative;z-index:1;}
+    .page-hero{padding:70px 60px 50px;border-bottom:1px solid rgba(0,245,255,0.08);position:relative;overflow:hidden;}
+    .page-hero::before{content:'';position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(0,245,255,0.06) 0%,transparent 70%);top:-150px;right:-100px;border-radius:50%;pointer-events:none;}
+    .page-eyebrow{font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.4em;text-transform:uppercase;color:var(--magenta);margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+    .page-eyebrow::before{content:'//';opacity:.5;}
+    .page-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(2rem,5vw,3.2rem);line-height:1;color:#fff;margin-bottom:16px;}
+    .page-desc{font-size:1.05rem;line-height:1.7;color:rgba(205,217,255,0.6);max-width:560px;}
+    .hero-stats{display:flex;gap:40px;margin-top:28px;}
+    .hero-stat .val{font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;color:var(--cyan);line-height:1;}
+    .hero-stat .lbl{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:rgba(205,217,255,0.35);margin-top:4px;}
+
+    /* FILTER BAR */
+    .filter-bar{position:sticky;top:70px;z-index:100;background:rgba(3,6,16,0.95);border-bottom:1px solid rgba(0,245,255,0.1);backdrop-filter:blur(12px);}
+    .filter-inner{display:flex;align-items:center;gap:0;overflow-x:auto;scrollbar-width:none;padding:0 60px;}
+    .filter-inner::-webkit-scrollbar{display:none;}
+    .filter-tab{font-family:'Share Tech Mono',monospace;font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(205,217,255,0.4);padding:18px 24px;border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;position:relative;}
+    .filter-tab:hover{color:#fff;}
+    .filter-tab.active{color:var(--tab-color,var(--cyan));border-bottom-color:var(--tab-color,var(--cyan));}
+    .filter-tab .count{font-size:.5rem;opacity:.5;margin-left:6px;}
+
+    /* FACTION SECTION */
+    .faction-section{padding:60px 0;position:relative;z-index:1;}
+    .faction-header{display:flex;align-items:center;gap:20px;padding:0 60px;margin-bottom:36px;}
+    .faction-badge{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--dark);padding:4px 14px;clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);}
+    .faction-name{font-family:'Orbitron',monospace;font-weight:700;font-size:1.4rem;color:#fff;}
+    .faction-desc{font-size:.95rem;color:rgba(205,217,255,0.45);margin-left:auto;font-style:italic;max-width:300px;text-align:right;}
+    .faction-line{flex:1;height:1px;}
+
+    /* CARD GRID */
+    .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;padding:0 60px;}
+    .card-item{position:relative;cursor:pointer;transition:transform .25s,box-shadow .25s;}
+    .card-item:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 20px 40px rgba(0,0,0,0.5);}
+    .card-item img{width:100%;display:block;border:1px solid rgba(255,255,255,0.06);transition:border-color .25s;}
+    .card-item:hover img{border-color:rgba(255,255,255,0.2);}
+    .card-item .overlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,rgba(0,0,0,0.7) 100%);opacity:0;transition:opacity .25s;display:flex;align-items:flex-end;padding:12px;}
+    .card-item:hover .overlay{opacity:1;}
+    .card-item .overlay span{font-family:'Share Tech Mono',monospace;font-size:.55rem;letter-spacing:.15em;color:rgba(255,255,255,0.7);}
+
+    /* LIGHTBOX */
+    .lightbox{position:fixed;inset:0;background:rgba(1,3,8,0.92);z-index:2000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
+    .lightbox.open{display:flex;}
+    .lightbox-inner{position:relative;max-width:400px;width:90%;}
+    .lightbox img{width:100%;display:block;}
+    .lightbox-close{position:absolute;top:-40px;right:0;font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:.2em;color:rgba(205,217,255,0.5);background:none;border:none;cursor:pointer;text-transform:uppercase;transition:color .2s;}
+    .lightbox-close:hover{color:#fff;}
+
+    /* FACTION SEPARATOR */
+    .faction-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.05),transparent);margin:0 60px;}
+
+    /* FOOTER */
+    .site-footer{position:relative;z-index:1;border-top:1px solid rgba(0,245,255,0.08);padding:60px;}
+    .footer-inner{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px;}
+    .footer-brand p{font-size:.9rem;color:rgba(205,217,255,0.35);line-height:1.65;margin-top:14px;max-width:220px;}
+    .footer-col h4{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--cyan);margin-bottom:18px;}
+    .footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
+    .footer-col a{font-size:.9rem;color:rgba(205,217,255,0.45);text-decoration:none;transition:color .2s;}
+    .footer-col a:hover{color:#fff;}
+    .footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:32px;border-top:1px solid rgba(255,255,255,0.05);}
+    .footer-bottom p{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:rgba(205,217,255,0.2);}
+    .status-badge{display:flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:rgba(205,217,255,0.3);}
+    .status-dot{width:6px;height:6px;border-radius:50%;background:#00ff88;box-shadow:0 0 8px #00ff88;animation:pulse 2s ease-in-out infinite;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    @media(max-width:900px){nav{padding:0 20px;}.nav-links{display:none;}.page-hero{padding:60px 20px 40px;}.filter-inner{padding:0 20px;}.faction-header{padding:0 20px;}.card-grid{padding:0 20px;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));}.faction-divider{margin:0 20px;}.footer-inner{grid-template-columns:1fr 1fr;}.site-footer{padding:40px 20px;}}
+  </style>
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<nav>
+  <a href="/" class="nav-logo">NEON<span>.</span>NEXUS</a>
+  <ul class="nav-links">
+    <li><a href="/rules/">Rules</a></li>
+    <li><a href="/cardcatalog/" class="active">Card Catalog</a></li>
+    <li><a href="/updates/">Updates</a></li>
+    <li><a href="/media/">Media</a></li>
+    <li><a href="https://discord.gg/UjmhvUgUZN">Discord</a></li>
+  </ul>
+  <a href="/kickstarter/" class="nav-cta">Kickstarter</a>
+</nav>
+
+<div class="page-top">
+  <div class="page-hero">
+    <p class="page-eyebrow">Set 1 — Neon Nightfall</p>
+    <h1 class="page-title">Card Catalog</h1>
+    <p class="page-desc">Browse every card in the Neon Nexus collection, organized by faction. Click any card to view it full size.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="val">222+</div><div class="lbl">Total Cards</div></div>
+      <div class="hero-stat"><div class="val">5</div><div class="lbl">Factions</div></div>
+      <div class="hero-stat"><div class="val">1</div><div class="lbl">Set Released</div></div>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <div class="filter-inner">
+      <button class="filter-tab active" data-faction="all" style="--tab-color:var(--cyan)">All Cards</button>
+      <button class="filter-tab" data-faction="ninjas" style="--tab-color:var(--blue)">🥷 Neon Ninjas</button>
+      <button class="filter-tab" data-faction="drakes" style="--tab-color:var(--purple)">🐉 Digital Dragonlords</button>
+      <button class="filter-tab" data-faction="quorum" style="--tab-color:var(--red)">⚛️ Quantum Quorum</button>
+      <button class="filter-tab" data-faction="templars" style="--tab-color:var(--green)">⚔️ Techno Templars</button>
+      <button class="filter-tab" data-faction="free" style="--tab-color:var(--amber)">🃏 Free Agents</button>
+    </div>
+  </div>
+
+  <!-- NEON NINJAS -->
+  <section class="faction-section" id="ninjas" data-faction="ninjas">
+    <div class="faction-header">
+      <span class="faction-badge" style="background:var(--blue);color:#000;">Neon Ninjas</span>
+      <div class="faction-name" style="color:var(--blue);">🥷 Neon Ninjas</div>
+      <div class="faction-line" style="background:linear-gradient(90deg,rgba(56,189,248,0.3),transparent);"></div>
+      <div class="faction-desc">Swift, silent, surgical</div>
+    </div>
+    <div class="card-grid" id="grid-ninjas">
+      <!-- Leaders -->
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/0928b7c2-a194-429b-b7cf-982d1473e079/222Kazuki.png" alt="Kazuki"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/2909ac70-680d-4bda-a083-e11f8cc31a19/221Satoshi.png" alt="Satoshi"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/29a3dfae-4a29-4d30-80c1-e6f5af3526b7/220Saito.png" alt="Saito"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/f8272c69-001c-4fda-9c75-e8619c1078e3/010.png" alt="010"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/c6fadaba-9597-4777-8368-8a0a3f351871/011.png" alt="011"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/6a59a6d6-d77e-4269-a888-b52ea09e4f32/012.png" alt="012"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/12612396-c321-4f15-a818-8fd813f82f2e/013.png" alt="013"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/c57f1ab0-17bb-41ea-97f8-bd7183a4e375/014.png" alt="014"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/c3578676-109e-487c-8843-456ddd1fe52c/015.png" alt="015"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/0e88f6ef-f959-40eb-8c66-7c4adb91cfd0/110.png" alt="110"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/1e79d408-6b99-44c2-9541-982bea54a2ca/111.png" alt="111"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/ac940aa1-27e6-40c1-b989-690bb4c605ba/112.png" alt="112"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/a02bb24c-6535-4b01-81c7-a390d1cac545/113.png" alt="113"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/a254cc25-4b7c-44d4-9bd8-7315cc5ab1f3/152.png" alt="152"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/94b74ff4-43e1-4e66-830f-ff45c9b2d08d/153.png" alt="153"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/549bf95a-ddc1-4c3a-8b6a-2ca72e03dc03/154.png" alt="154"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/9f9f76b7-52d0-4ff3-9f17-0af265106c94/155.png" alt="155"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/4d199e99-fe85-47dd-b38d-3693c652dbfc/156.png" alt="156"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/3711218d-79de-4838-ad76-ed5864ddb046/157.png" alt="157"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/b50a67fb-b89a-44af-8772-b023a71cf98b/158.png" alt="158"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/16cb7f1f-9db4-4b67-a308-f0e0169f6bc1/159.png" alt="159"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/c0563c6c-b45d-46ec-bf2d-32a9f195d011/160.png" alt="160"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/13f57ec4-149d-4a96-97cb-dc2fc1c1cf0f/161.png" alt="161"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/16bb9d44-8090-42a2-935e-220139301bd3/162.png" alt="162"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/21154053-e7f9-4b7d-8cfa-8e8e2b8ba607/163.png" alt="163"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/314f37b4-ecec-4355-8005-ab09608d041b/164.png" alt="164"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/bba17a8b-2183-44a8-a142-9d30f23f1fef/165.png" alt="165"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/ab143031-5cc6-4fb6-81a0-e80557116566/166.png" alt="166"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/362e6544-82fc-4349-a3c7-d71bdc2d2357/167.png" alt="167"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/f260ba78-31cd-4fd9-a3ae-4a9620c3ae00/168.png" alt="168"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/895253bb-f8d9-4617-a6a3-d1026b16a070/169.png" alt="169"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/49fb7650-5a62-4b3e-9c4d-aea03c00ab21/170.png" alt="170"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/7dc4deb9-6c0f-4954-bca2-1be8e063478e/171.png" alt="171"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/d4bb282a-b46d-4390-9e32-587138d1be0d/172.png" alt="172"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/8ac1a156-c6ef-4b2e-9e32-acce9c6345a9/173.png" alt="173"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/1c257fee-563a-4d88-8680-aba499db7bb2/174.png" alt="174"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/a85d1db2-bd98-461d-aeda-0396e1edef3c/175.png" alt="175"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/0e35e310-d71d-451e-9956-9376f6d9e581/176.png" alt="176"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/989e077d-4d8a-49ea-b518-0488ed7665f7/186.png" alt="186"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/39a780c3-9fd1-404b-bb3e-0018504d8288/187.png" alt="187"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/f928d182-a751-4795-8618-9ac9c5cdf410/188.png" alt="188"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/3829c43a-429c-40f8-a94d-87b76769e6e6/189.png" alt="189"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/1c603338-a159-420e-b135-83a659294d4f/190.png" alt="190"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/721827bc-9ee4-4ac6-b196-5be5224f0e41/191.png" alt="191"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/a7afb6bb-0449-4849-9537-0689dbc54410/192.png" alt="192"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/ab86d82f-3c09-45ea-8572-bf6426102662/193.png" alt="193"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/eb835a87-9b56-4a02-9567-f2785f1f9777/194.png" alt="194"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/381b8bec-8e53-4a8f-a63f-4b9f02d9d651/195.png" alt="195"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/5f01ca9f-9500-4c24-880b-ea46ff30a779/196.png" alt="196"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/83031b7d-68de-4545-8dbb-2ec892e3fdb5/197.png" alt="197"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/f1111d68-4a0f-4a7c-bfeb-60e7540b08cc/198.png" alt="198"/><div class="overlay"><span>View fullsize</span></div></div>
+    </div>
+  </section>
+
+  <div class="faction-divider"></div>
+
+  <!-- DIGITAL DRAGONLORDS -->
+  <section class="faction-section" id="drakes" data-faction="drakes">
+    <div class="faction-header">
+      <span class="faction-badge" style="background:var(--purple);">Digital Dragonlords</span>
+      <div class="faction-name" style="color:var(--purple);">🐉 Digital Dragonlords</div>
+      <div class="faction-line" style="background:linear-gradient(90deg,rgba(168,85,247,0.3),transparent);"></div>
+      <div class="faction-desc">Ancient power, digital mastery</div>
+    </div>
+    <div class="card-grid" id="grid-drakes">
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/ae935ec8-d90f-4a27-a177-001ff5c2c2ca/021Nyla.png" alt="Nyla"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/177368ed-b6f6-4e2f-a9b4-cff0cda28ae5/022Drake.png" alt="Drake"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/1e7e3c40-0912-4799-8541-e8390bc51318/023Qael.png" alt="Qael"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/54367e13-0ada-4358-9c2b-46de601b6832/048.png" alt="048"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/9f64e726-8db0-409a-990d-734cd8d98713/049.png" alt="049"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/547ba02a-76f4-4ebe-b08f-a2740a9b1c92/050.png" alt="050"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/20e855bc-9bd5-45b9-a53d-097c5e371b31/051.png" alt="051"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/439687ef-e4f7-4c9c-82bc-cbec188dc484/052.png" alt="052"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/7252f560-10b9-494f-a645-a8bac41aee14/053.png" alt="053"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/74fbbf4c-3023-45b7-9540-0517b27f8297/054.png" alt="054"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/bf8bb4b4-a210-4c01-9a31-10ed1c15966d/055.png" alt="055"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/6ee12e25-e826-4094-a497-fe51f6d13c37/056.png" alt="056"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/1d66d72b-1fe8-475a-be23-5fa0f68b772d/057.png" alt="057"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/8ea8ba89-c75e-4c55-9157-71c2a2296d4e/058.png" alt="058"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/a311971d-96f5-49b6-a5e5-de85e82f4f7a/059.png" alt="059"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/9eb93b3d-9896-456a-a893-0604fcdb0b62/060.png" alt="060"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/9d3a679f-9b2f-44a5-b920-aead5ca09d67/061.png" alt="061"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/6a945c72-8574-4124-8dad-5e2299c97e37/062.png" alt="062"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/6844ce84-3112-4711-a5c6-99576a1470bc/063.png" alt="063"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/397dd148-86cd-4566-84c6-ea55d34a2849/064.png" alt="064"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/03c39215-6dca-441e-b987-da2352ab63b2/065.png" alt="065"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/31df0e03-5bfe-417f-81a9-6f989c3b743a/066.png" alt="066"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/8d8115dc-143d-41e1-a7ef-352b4543cd28/067.png" alt="067"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/254a8c18-86d1-43df-a87e-b1a392565fe3/068.png" alt="068"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/437293a3-bd6a-4c15-9235-d73810157dce/069.png" alt="069"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/ad28bfd4-5796-4af5-957c-114c2a87f93c/070.png" alt="070"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/7872cbf1-0ad1-4d38-a777-d2706f1cb451/071.png" alt="071"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/f94a0df2-83b2-4372-8d78-4ffed4f83de9/072.png" alt="072"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/2cb02c31-71c5-44b1-b8eb-fe48bd642769/114.png" alt="114"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/c7405fd0-b08a-4fc0-b8e2-2a921530e274/115.png" alt="115"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/5e0a2bbf-9e8e-4339-983a-e60e3260529e/116.png" alt="116"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/534af58d-2d6b-4ef4-bc62-27c9b9b82837/117.png" alt="117"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/9b16b8d1-6d5e-4330-a262-2ba75556d3ad/118.png" alt="118"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/119659c6-3949-4dd5-a13e-b6d34eada227/144.png" alt="144"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/25b90452-45d3-40ab-8821-566155546f3a/145.png" alt="145"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/4c775e9f-a2ec-49cf-92f4-1f9490334b60/146.png" alt="146"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/296c830a-3fb4-4dc0-a94a-c9596a934203/147.png" alt="147"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/ecd1b6b1-4d40-4c79-befb-f78867b90fa5/148.png" alt="148"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/77095492-cdcf-4e59-9a6d-c2519b16592e/149.png" alt="149"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/0abf7385-ddf0-4750-acf4-0578549f30d1/177.png" alt="177"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/32cb64df-9191-45d1-bb3c-539a6ca048d4/178.png" alt="178"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/5e440762-8f4c-4a60-9402-a9d42903192b/179.png" alt="179"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/ef0d4333-a9b8-417b-885e-b9ad0754e83d/180.png" alt="180"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/00c29391-6436-418c-af7d-57aac9357f0f/181.png" alt="181"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/c1acc9cc-ed2f-40d2-950a-0afc18c9d6c3/182.png" alt="182"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/73faa8c8-38d4-4af4-b3a3-dde43ba10e28/183.png" alt="183"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/03408405-7262-4f24-9bba-096ede716b30/184.png" alt="184"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/f86ffc55-b63d-48ab-b07c-cac979c47bfb/185.png" alt="185"/><div class="overlay"><span>View fullsize</span></div></div>
+    </div>
+  </section>
+
+  <div class="faction-divider"></div>
+
+  <!-- QUANTUM QUORUM -->
+  <section class="faction-section" id="quorum" data-faction="quorum">
+    <div class="faction-header">
+      <span class="faction-badge" style="background:var(--red);">Quantum Quorum</span>
+      <div class="faction-name" style="color:var(--red);">⚛️ Quantum Quorum</div>
+      <div class="faction-line" style="background:linear-gradient(90deg,rgba(239,68,68,0.3),transparent);"></div>
+      <div class="faction-desc">Rewrite the laws of reality</div>
+    </div>
+    <div class="card-grid" id="grid-quorum">
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/af6260e6-9676-4f39-9dfc-24ed560a96cb/038.png" alt="038"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/dc1fdf44-d23c-4086-8e17-bc38b78463ab/039.png" alt="039"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/5b280575-49d8-454c-b491-dae0042bcfaf/040.png" alt="040"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/bf8e825f-a986-4bea-bf71-800ada411921/041.png" alt="041"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/af179007-3f45-4e10-afda-ec3338f82576/042.png" alt="042"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/748cc3ab-932e-4202-b801-0b6ea10755e7/043.png" alt="043"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/ab8f48da-d338-4a24-8009-76c7c1c1d29c/044.png" alt="044"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/62375c0d-44f0-470c-94fa-5aae45a6e6c8/099.png" alt="099"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/33fd9d8e-d6b9-464e-9849-2e7748133479/100.png" alt="100"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/01c7a67b-244e-4d77-9cc6-3137acfd2c8e/101.png" alt="101"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/84c070a6-3772-45bf-94f7-c7e28614cca8/102.png" alt="102"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/39a85735-2753-499a-9dd3-774d1e04e001/103.png" alt="103"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/6c812416-114b-4331-95da-e2c39cc69ef5/104.png" alt="104"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/59b2f8a4-5e1e-4042-8791-71c4893f8413/105.png" alt="105"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/ce0f2b44-43ff-4852-b8a6-81520caf1c71/119.png" alt="119"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/0eefdf08-7746-4d7d-b208-664bffe30fed/120.png" alt="120"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/32e9c0b6-cec1-4c7d-8f68-aba0943dea75/121.png" alt="121"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/f23aeb18-45d3-486e-85d9-ddbd68473392/122.png" alt="122"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/98f99e44-cafe-4023-a169-89104b1fc196/123.png" alt="123"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/c9d94155-f781-485f-a33d-37ecc41b4663/124.png" alt="124"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/0baba40a-a95e-42af-9dc6-210cc7167eeb/125.png" alt="125"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/b483bfbb-0bbf-4341-95de-3a5ec193a5f4/126.png" alt="126"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/722084db-0b24-483d-b9e7-039ac52b040b/127.png" alt="127"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/6a6e20e6-7d95-4589-8d58-a4bd2d844d34/128.png" alt="128"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/d3928def-8546-4797-8e5f-8a4fcca2f400/129.png" alt="129"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/e2a73e8f-fef3-429a-b2c4-5846373655b1/130.png" alt="130"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/2b10910a-01f7-4ec8-943e-e7194ae10821/131.png" alt="131"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/aeb903e8-2507-46f2-b811-953227ce1373/132.png" alt="132"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/56742a75-97dc-4ff8-8b2f-b7b001209d52/133.png" alt="133"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/e0ddea54-7233-408b-b2a7-7acfb79bc12d/134.png" alt="134"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/1e2c9e03-7fea-4d52-901f-d4c2f2b74b0a/135.png" alt="135"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/b8442a8a-a0e5-4ec5-8dfb-b360fbffdbec/136.png" alt="136"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/a87a6be6-85d3-470d-a542-d6ef270b4b47/137.png" alt="137"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/100663a5-0f31-4d69-804a-02a66dcb462d/138.png" alt="138"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/57fc4369-8275-414f-9c16-fa0c5ebc81ee/139.png" alt="139"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/0e195648-ea53-4e01-9127-12bab70f5fdb/140.png" alt="140"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/9de33409-76d7-43c0-b368-2610abcab411/141.png" alt="141"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/02571245-9bf6-4b58-81be-b9d1167cc381/142.png" alt="142"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/83cb7a26-51ac-4d58-b21c-d684b5225653/143.png" alt="143"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/0401cc6a-b00f-4981-a4f5-02f2b82e8196/199.png" alt="199"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/9cb01599-31e7-4c25-aba7-9aa9b5602c7c/200.png" alt="200"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/dc50e6fc-d68e-41c6-8ba5-0f528f905892/201.png" alt="201"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/24221614-99ac-4350-b610-617273d99459/202.png" alt="202"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/1a565253-48e1-4c59-9157-02f4be94ba84/203.png" alt="203"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/5de3819a-c481-4a93-b97b-e037aa188733/204.png" alt="204"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/323c5635-787b-4e4f-9973-7062ac8a0ecb/205.png" alt="205"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/53b7f33d-7786-46e6-bafc-88812e8c3000/206.png" alt="206"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/85d225ba-788a-46df-97c3-8a928b2b974d/207.png" alt="207"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/1c603070-3587-460f-ab67-fdfc75a35845/208.png" alt="208"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/04a37a89-f67d-4a9f-bd28-31fd2dd4da86/209.png" alt="209"/><div class="overlay"><span>View fullsize</span></div></div>
+    </div>
+  </section>
+
+  <div class="faction-divider"></div>
+
+  <!-- TECHNO TEMPLARS -->
+  <section class="faction-section" id="templars" data-faction="templars">
+    <div class="faction-header">
+      <span class="faction-badge" style="background:var(--green);color:#000;">Techno Templars</span>
+      <div class="faction-name" style="color:var(--green);">⚔️ Techno Templars</div>
+      <div class="faction-line" style="background:linear-gradient(90deg,rgba(34,197,94,0.3),transparent);"></div>
+      <div class="faction-desc">Holy warriors of the new age</div>
+    </div>
+    <div class="card-grid" id="grid-templars">
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/4f0172ee-0ce5-43fd-a03a-85ecff7f0440/045Tsuro.png" alt="Tsuro"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/70bf9e63-0154-4b85-aa05-4ddfdfb0ea3c/1Lucia.png" alt="Lucia"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/81b3277b-33e6-4562-8767-9dc21b1ef8df/2Magus.png" alt="Magus"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/a44315b4-cce2-4875-b606-956d442d9225/016.png" alt="016"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/de6841ae-20c0-4c05-94ab-0409b5a4e470/017.png" alt="017"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/17c31e40-6972-46f7-a14a-22c08cdc2122/018.png" alt="018"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/4920b123-7327-48e7-b6a7-22debf00f610/019.png" alt="019"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/f697a81e-cd80-4dab-8397-0ef7b031f8d3/020.png" alt="020"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/f99aeb0c-ff87-44ec-96c0-76081e9672b3/031.png" alt="031"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/463fd928-603f-43f3-a527-d222b2c3f6ec/032.png" alt="032"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/1862a21a-ae4e-44b4-af87-14359036dbc1/033.png" alt="033"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/a1de9a29-657b-4588-812c-e3ae696fcfe9/034.png" alt="034"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/55a9cfc9-8c5d-46c1-99da-bc59452ad3e7/035.png" alt="035"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/6cbc3e7c-fea8-4550-bffc-c4ba719a3421/036.png" alt="036"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/bfd9ece5-fb8d-47b7-9d20-8ea0edb39df7/037.png" alt="037"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/d5112e27-5cf8-4f03-b86e-1500ccfea470/073.png" alt="073"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/07f342b2-110b-4ce8-918e-54f6ae0307d9/074.png" alt="074"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/6e23a53d-7c87-40ef-8214-14fe56fa146d/075.png" alt="075"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/b6f72f70-cc5e-40fa-8bf0-217211c24394/076.png" alt="076"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/b8cd28b0-703b-4f60-bf56-2c0819d31471/077.png" alt="077"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/df93da23-a14d-4a4f-9213-ec6ef5e63a17/078.png" alt="078"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/28641d27-4a19-4564-b4d4-b703dbf10ac2/079.png" alt="079"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/2207af58-6317-4787-956f-7bbf5d098d89/080.png" alt="080"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/34a82147-4b39-4b93-934e-4d9ecadef69b/081.png" alt="081"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/0b6b5c89-cea9-4618-aa25-11ca112a4b7a/082.png" alt="082"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/99da307f-ed00-4716-9205-baf6f590f0ef/083.png" alt="083"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/cd6da214-17d5-43e9-afb7-f304ceb58939/084.png" alt="084"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/51adc8d0-df4e-4876-acaa-9f635cee9989/085.png" alt="085"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/f3695bb4-9fc5-4c4f-b18a-8f4f4d48ee51/086.png" alt="086"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/f7aa6d2f-b9ad-4291-8daa-5bec0c2af857/087.png" alt="087"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/83062fde-2a97-4694-9aaf-96180a83602c/088.png" alt="088"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/ef79bdb7-86dd-4926-80db-cf190c8de9de/089.png" alt="089"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/cc771c98-a14a-49dd-a714-686ed501ac39/090.png" alt="090"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/8e1ccbcd-0de4-4a62-8ced-886bbaae2638/091.png" alt="091"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/f2cba0ab-c448-4db2-aebe-6f537ddbcd10/092.png" alt="092"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/26d93196-9f28-4254-a7ad-c7d7745c11e2/093.png" alt="093"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/63b25b6f-025c-49a1-adf3-fc804f540825/210.png" alt="210"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/44683bb0-617d-4ce3-80eb-6038a611a0a2/211.png" alt="211"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/457e94d4-f895-4252-9a94-bb961d8c2a2d/212.png" alt="212"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/249fb6a3-ba42-41c5-a46b-088c6802fdc5/213.png" alt="213"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/aa560534-5de1-4fd8-8c85-6da1efc6c261/214.png" alt="214"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/6f0997eb-73d5-4879-8eb2-0ce926576462/215.png" alt="215"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/159e977b-4e65-4c5a-be55-9ffbb633e94b/216.png" alt="216"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/fa04236c-92d2-4784-9a94-b9be7a18caaa/217.png" alt="217"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/a0006caa-0ccd-4ddd-82c5-8bd24e9d7904/218.png" alt="218"/><div class="overlay"><span>View fullsize</span></div></div>
+      <div class="card-item"><img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/523c4538-ebb9-48c0-a365-bb815a75d3f9/219.png" alt="219"/><div class="overlay"><span>View fullsize</span></div></div>
+    </div>
+  </section>
+
+  <div class="faction-divider"></div>
+
+  <!-- FREE AGENTS placeholder -->
+  <section class="faction-section" id="free" data-faction="free">
+    <div class="faction-header">
+      <span class="faction-badge" style="background:var(--amber);color:#000;">Free Agents</span>
+      <div class="faction-name" style="color:var(--amber);">🃏 Free Agents</div>
+      <div class="faction-line" style="background:linear-gradient(90deg,rgba(245,158,11,0.3),transparent);"></div>
+      <div class="faction-desc">Loyal only to the highest bidder</div>
+    </div>
+    <div style="padding:40px 60px;">
+      <div style="background:rgba(245,158,11,0.05);border:1px solid rgba(245,158,11,0.15);padding:32px 40px;max-width:500px;clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,0 100%);">
+        <p style="font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.2em;color:var(--amber);margin-bottom:10px;">// COMING SOON</p>
+        <p style="font-size:1rem;color:rgba(205,217,255,0.6);line-height:1.7;">Free Agent cards are neutral and can be used in any faction deck. Check back as more cards are added to the catalog.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" id="lb-close">[ Close ]</button>
+    <img id="lb-img" src="" alt="Card"/>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand footer-col">
+      <a href="/" class="nav-logo">NEON<span>.</span>NEXUS</a>
+      <p>A cyberpunk TCG where five factions battle for control of the city. Your moves. Their fate.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navigate</h4>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/rules/">Rules</a></li>
+        <li><a href="/cardcatalog/">Card Catalog</a></li>
+        <li><a href="/updates/">Updates</a></li>
+        <li><a href="/kickstarter/">Kickstarter</a></li>
+        <li><a href="/media/">Media</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Community</h4>
+      <ul>
+        <li><a href="https://discord.gg/UjmhvUgUZN">Discord</a></li>
+        <li><a href="https://www.youtube.com/@NeonNexusTCG">YouTube</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Factions</h4>
+      <ul>
+        <li><a href="#drakes" style="color:rgba(168,85,247,0.7)">Digital Dragonlords</a></li>
+        <li><a href="#ninjas" style="color:rgba(56,189,248,0.7)">Neon Ninjas</a></li>
+        <li><a href="#quorum" style="color:rgba(239,68,68,0.7)">Quantum Quorum</a></li>
+        <li><a href="#templars" style="color:rgba(34,197,94,0.7)">Techno Templars</a></li>
+        <li><a href="#free" style="color:rgba(245,158,11,0.7)">Free Agents</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2024 NEON NEXUS TCG — ALL RIGHTS RESERVED</p>
+    <div class="status-badge"><div class="status-dot"></div>SET 1 — NEON NIGHTFALL</div>
+  </div>
+</footer>
+
+<script>
+  // Filter tabs
+  document.querySelectorAll('.filter-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.faction;
+      document.querySelectorAll('.faction-section').forEach(s => {
+        s.style.display = (f === 'all' || s.dataset.faction === f) ? '' : 'none';
+      });
+      document.querySelectorAll('.faction-divider').forEach(d => {
+        d.style.display = f === 'all' ? '' : 'none';
+      });
+    });
+  });
+
+  // Lightbox
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lb-img');
+  document.querySelectorAll('.card-item').forEach(card => {
+    card.addEventListener('click', () => {
+      lbImg.src = card.querySelector('img').src;
+      lb.classList.add('open');
+    });
+  });
+  document.getElementById('lb-close').addEventListener('click', () => lb.classList.remove('open'));
+  lb.addEventListener('click', e => { if (e.target === lb) lb.classList.remove('open'); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
+</script>
+</body>
+</html>

@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rules — Neon Nexus TCG</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --cyan: #00f5ff;
+      --magenta: #ff006e;
+      --yellow: #ffe600;
+      --green: #22c55e;
+      --purple: #a855f7;
+      --dark: #030610;
+      --darker: #010308;
+      --mid: #0a0f2e;
+      --grid-color: rgba(0,245,255,0.05);
+      --glow-cyan: 0 0 20px rgba(0,245,255,0.6), 0 0 60px rgba(0,245,255,0.2);
+      --glow-magenta: 0 0 20px rgba(255,0,110,0.6), 0 0 60px rgba(255,0,110,0.2);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--darker);
+      color: #cdd9ff;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 16px;
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    /* SCANLINES */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px);
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* GRID */
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      height: 70px;
+      background: linear-gradient(180deg, rgba(3,6,16,0.98) 0%, rgba(3,6,16,0.8) 100%);
+      border-bottom: 1px solid rgba(0,245,255,0.15);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav-logo {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      font-size: 1.2rem;
+      letter-spacing: 0.15em;
+      color: var(--cyan);
+      text-shadow: var(--glow-cyan);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--magenta); }
+
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+
+    .nav-links a {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(205,217,255,0.6);
+      text-decoration: none;
+      transition: color 0.2s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 1px;
+      background: var(--cyan);
+      transition: width 0.3s;
+      box-shadow: var(--glow-cyan);
+    }
+    .nav-links a:hover { color: var(--cyan); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-links a.active { color: var(--cyan); }
+    .nav-links a.active::after { width: 100%; }
+
+    .nav-cta {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--dark);
+      background: var(--magenta);
+      padding: 8px 20px;
+      text-decoration: none;
+      clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .nav-cta:hover { background: #ff3d8a; box-shadow: var(--glow-magenta); }
+
+    /* LAYOUT */
+    .page-wrapper {
+      display: flex;
+      min-height: 100vh;
+      padding-top: 70px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* SIDEBAR TOC */
+    .sidebar {
+      width: 260px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 70px;
+      height: calc(100vh - 70px);
+      overflow-y: auto;
+      padding: 40px 24px;
+      border-right: 1px solid rgba(0,245,255,0.08);
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0,245,255,0.2) transparent;
+    }
+
+    .sidebar::-webkit-scrollbar { width: 2px; }
+    .sidebar::-webkit-scrollbar-thumb { background: rgba(0,245,255,0.2); }
+
+    .toc-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toc-label::before {
+      content: '';
+      width: 20px; height: 1px;
+      background: var(--cyan);
+      box-shadow: var(--glow-cyan);
+    }
+
+    .toc-list { list-style: none; }
+
+    .toc-list li { margin-bottom: 2px; }
+
+    .toc-list a {
+      display: block;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: rgba(205,217,255,0.4);
+      text-decoration: none;
+      padding: 6px 10px;
+      border-left: 1px solid transparent;
+      transition: all 0.2s;
+      line-height: 1.4;
+    }
+    .toc-list a:hover {
+      color: var(--cyan);
+      border-left-color: var(--cyan);
+      background: rgba(0,245,255,0.04);
+    }
+    .toc-list a.active {
+      color: var(--cyan);
+      border-left-color: var(--cyan);
+    }
+
+    .toc-section-head {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: rgba(205,217,255,0.2);
+      padding: 16px 10px 6px;
+    }
+
+    /* MAIN CONTENT */
+    .main-content {
+      flex: 1;
+      max-width: 860px;
+      padding: 60px 60px 120px;
+    }
+
+    /* PAGE HEADER */
+    .page-header {
+      margin-bottom: 64px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid rgba(0,245,255,0.08);
+    }
+
+    .page-eyebrow {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--magenta);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .page-eyebrow::before { content: '//'; opacity: 0.5; }
+
+    .page-title {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      line-height: 1;
+      color: #fff;
+      margin-bottom: 20px;
+    }
+    .page-title em {
+      font-style: normal;
+      color: var(--cyan);
+      text-shadow: var(--glow-cyan);
+    }
+
+    .page-desc {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: rgba(205,217,255,0.6);
+      max-width: 600px;
+    }
+
+    .version-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      color: var(--cyan);
+      border: 1px solid rgba(0,245,255,0.2);
+      padding: 4px 12px;
+      margin-top: 20px;
+      clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+    }
+    .version-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 6px var(--cyan);
+    }
+
+    /* RULE SECTIONS */
+    .rule-section {
+      margin-bottom: 64px;
+      scroll-margin-top: 90px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .section-num {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--cyan);
+      opacity: 0.5;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: 0.08em;
+      color: #fff;
+    }
+
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(0,245,255,0.2), transparent);
+    }
+
+    /* INFO BLOCK */
+    .info-block {
+      background: rgba(10,15,46,0.5);
+      border: 1px solid rgba(0,245,255,0.1);
+      border-left: 3px solid var(--cyan);
+      padding: 24px 28px;
+      margin-bottom: 20px;
+      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+    }
+
+    .info-block p {
+      font-size: 1rem;
+      line-height: 1.75;
+      color: rgba(205,217,255,0.75);
+    }
+
+    .info-block p + p { margin-top: 12px; }
+
+    /* HIGHLIGHT BOX */
+    .highlight-box {
+      background: rgba(0,245,255,0.04);
+      border: 1px solid rgba(0,245,255,0.15);
+      padding: 20px 24px;
+      margin: 20px 0;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .highlight-box.warning {
+      background: rgba(255,0,110,0.04);
+      border-color: rgba(255,0,110,0.2);
+    }
+
+    .highlight-box.tip {
+      background: rgba(34,197,94,0.04);
+      border-color: rgba(34,197,94,0.2);
+    }
+
+    .hb-icon {
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .hb-content strong {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      display: block;
+      margin-bottom: 6px;
+    }
+    .highlight-box.warning .hb-content strong { color: var(--magenta); }
+    .highlight-box.tip .hb-content strong { color: var(--green); }
+
+    .hb-content p {
+      font-size: 0.95rem;
+      line-height: 1.65;
+      color: rgba(205,217,255,0.65);
+    }
+
+    /* STEP LIST */
+    .step-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .step-list li {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--cyan);
+      background: rgba(0,245,255,0.08);
+      border: 1px solid rgba(0,245,255,0.2);
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+    }
+
+    .step-body {
+      padding-top: 4px;
+      font-size: 1rem;
+      line-height: 1.65;
+      color: rgba(205,217,255,0.75);
+    }
+
+    .step-body strong {
+      color: #fff;
+      font-weight: 700;
+    }
+
+    /* TURN PHASES */
+    .phase-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 8px;
+    }
+
+    .phase-row {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 0;
+      background: rgba(10,15,46,0.4);
+      border: 1px solid rgba(0,245,255,0.07);
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .phase-row:hover { border-color: rgba(0,245,255,0.2); }
+
+    .phase-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      background: rgba(0,245,255,0.06);
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      border-right: 1px solid rgba(0,245,255,0.1);
+    }
+
+    .phase-desc {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: rgba(205,217,255,0.65);
+      padding: 14px 20px;
+    }
+
+    .phase-desc strong { color: #fff; }
+
+    /* CARD TYPES GRID */
+    .card-types-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .card-type-item {
+      background: rgba(10,15,46,0.5);
+      border: 1px solid rgba(0,245,255,0.08);
+      padding: 20px;
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .card-type-item:hover {
+      border-color: rgba(0,245,255,0.2);
+      background: rgba(10,15,46,0.8);
+    }
+
+    .ct-tag {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--dark);
+      background: var(--cyan);
+      padding: 2px 8px;
+      display: inline-block;
+      margin-bottom: 10px;
+      clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+    }
+
+    .ct-tag.magenta { background: var(--magenta); }
+    .ct-tag.yellow  { background: var(--yellow); }
+    .ct-tag.purple  { background: var(--purple); }
+    .ct-tag.green   { background: var(--green); }
+    .ct-tag.gray    { background: rgba(205,217,255,0.3); }
+
+    .ct-name {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .ct-desc {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: rgba(205,217,255,0.55);
+    }
+
+    /* CARD ANATOMY */
+    .card-anatomy {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 40px;
+      align-items: start;
+      margin-top: 8px;
+    }
+
+    .card-diagram {
+      width: 180px;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #0a0f2e, #050b20);
+      border: 1px solid rgba(0,245,255,0.3);
+      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+      position: relative;
+    }
+
+    .cd-top {
+      background: linear-gradient(135deg, rgba(0,245,255,0.15), rgba(168,85,247,0.15));
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      position: relative;
+      border-bottom: 1px solid rgba(0,245,255,0.15);
+    }
+
+    .cd-cost {
+      position: absolute;
+      top: 6px; right: 6px;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.8rem;
+      font-weight: 900;
+      color: var(--cyan);
+      background: rgba(3,6,16,0.8);
+      border: 1px solid rgba(0,245,255,0.3);
+      width: 24px; height: 24px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .cd-body { padding: 10px 10px 6px; }
+
+    .cd-name {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    .cd-type {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.5rem;
+      color: var(--cyan);
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+    }
+
+    .cd-text {
+      font-size: 0.55rem;
+      line-height: 1.5;
+      color: rgba(205,217,255,0.5);
+      border-top: 1px solid rgba(0,245,255,0.1);
+      padding-top: 6px;
+      margin-bottom: 6px;
+      font-family: 'Rajdhani', sans-serif;
+    }
+
+    .cd-stats {
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid rgba(0,245,255,0.1);
+      padding-top: 6px;
+    }
+
+    .cd-stat {
+      text-align: center;
+    }
+
+    .cd-stat-val {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+
+    .cd-stat-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.4rem;
+      color: rgba(205,217,255,0.3);
+      letter-spacing: 0.1em;
+    }
+
+    .anatomy-annotations {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .annotation {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .ann-bullet {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--cyan);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .ann-text { font-size: 0.9rem; line-height: 1.5; color: rgba(205,217,255,0.65); }
+    .ann-text strong { color: #fff; }
+
+    /* GLOSSARY */
+    .glossary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .gloss-item {
+      background: rgba(10,15,46,0.4);
+      border: 1px solid rgba(0,245,255,0.07);
+      padding: 16px 18px;
+      transition: border-color 0.2s;
+    }
+
+    .gloss-item:hover { border-color: rgba(0,245,255,0.2); }
+
+    .gloss-term {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--cyan);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .gloss-tag {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.5rem;
+      letter-spacing: 0.15em;
+      color: var(--magenta);
+      border: 1px solid rgba(255,0,110,0.3);
+      padding: 1px 5px;
+    }
+
+    .gloss-def {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: rgba(205,217,255,0.55);
+    }
+
+    /* WIN CONDITIONS */
+    .win-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .win-card {
+      background: rgba(10,15,46,0.5);
+      border: 1px solid rgba(0,245,255,0.1);
+      padding: 28px 24px;
+      position: relative;
+      overflow: hidden;
+      clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%);
+    }
+
+    .win-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0,245,255,0.06) 0%, transparent 60%);
+    }
+
+    .win-icon { font-size: 2rem; margin-bottom: 12px; }
+
+    .win-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--cyan);
+      margin-bottom: 10px;
+    }
+
+    .win-desc {
+      font-size: 0.95rem;
+      line-height: 1.65;
+      color: rgba(205,217,255,0.65);
+    }
+
+    /* DIVIDER */
+    hr.rule-divider {
+      border: none;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,245,255,0.15), transparent);
+      margin: 48px 0;
+    }
+
+    /* FOOTER */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid rgba(0,245,255,0.08);
+      padding: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-left a {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      font-size: 1rem;
+      color: var(--cyan);
+      text-decoration: none;
+      letter-spacing: 0.15em;
+    }
+    .footer-left a span { color: var(--magenta); }
+
+    .footer-right {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      color: rgba(205,217,255,0.2);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .main-content { padding: 40px 24px 80px; }
+      .card-types-grid { grid-template-columns: 1fr; }
+      .glossary-grid { grid-template-columns: 1fr; }
+      .win-grid { grid-template-columns: 1fr; }
+      .card-anatomy { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .phase-row { grid-template-columns: 1fr; }
+      .phase-label { border-right: none; border-bottom: 1px solid rgba(0,245,255,0.1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="/" class="nav-logo">NEON<span>.</span>NEXUS</a>
+    <ul class="nav-links">
+      <li><a href="/rules/" class="active">Rules</a></li>
+      <li><a href="/cardcatalog/">Card Catalog</a></li>
+      <li><a href="/updates/">Updates</a></li>
+      <li><a href="/media/">Media</a></li>
+      <li><a href="https://discord.gg/UjmhvUgUZN">Discord</a></li>
+    </ul>
+    <a href="/kickstarter/" class="nav-cta">Kickstarter</a>
+  </nav>
+
+  <div class="page-wrapper">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <p class="toc-label">Contents</p>
+      <ul class="toc-list">
+        <li><p class="toc-section-head">Getting Started</p></li>
+        <li><a href="#objective">01 — Objective</a></li>
+        <li><a href="#setup">02 — Game Setup</a></li>
+        <li><a href="#deck">03 — Deck Construction</a></li>
+        <li><p class="toc-section-head">Gameplay</p></li>
+        <li><a href="#turn">04 — Turn Structure</a></li>
+        <li><a href="#playing-cards">05 — Playing Cards</a></li>
+        <li><a href="#combat">06 — Combat Rules</a></li>
+        <li><a href="#winning">07 — Winning the Game</a></li>
+        <li><p class="toc-section-head">Reference</p></li>
+        <li><a href="#card-types">08 — Card Types</a></li>
+        <li><a href="#anatomy">09 — Card Anatomy</a></li>
+        <li><a href="#glossary">10 — Keyword Glossary</a></li>
+      </ul>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+      <!-- PAGE HEADER -->
+      <div class="page-header">
+        <p class="page-eyebrow">Rulebook v1.0</p>
+        <h1 class="page-title">How to Play<br/><em>Neon Nexus</em></h1>
+        <p class="page-desc">Everything you need to enter the city, build your deck, and fight for control of the Nexus. Read through before your first game — the rules are easier than they look.</p>
+        <span class="version-badge">Version 1.0 — Current</span>
+      </div>
+
+      <!-- 01 OBJECTIVE -->
+      <section class="rule-section" id="objective">
+        <div class="section-header">
+          <span class="section-num">01</span>
+          <h2 class="section-title">Objective</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="win-grid">
+          <div class="win-card">
+            <div class="win-icon">💀</div>
+            <div class="win-title">Defeat the Leader</div>
+            <p class="win-desc">Reduce your opponent's Leader's HP to zero. Every attack and strategy ultimately points toward this goal.</p>
+          </div>
+          <div class="win-card">
+            <div class="win-icon">📭</div>
+            <div class="win-title">Deck Destruction</div>
+            <p class="win-desc">If your opponent cannot draw a card because their deck is empty, you win immediately.</p>
+          </div>
+        </div>
+      </section>
+
+      <hr class="rule-divider" />
+
+      <!-- 02 SETUP -->
+      <section class="rule-section" id="setup">
+        <div class="section-header">
+          <span class="section-num">02</span>
+          <h2 class="section-title">Game Setup</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="info-block">
+          <p>Before the game begins, both players prepare their side of the Server by following these steps in order. Each step must be completed before moving to the next.</p>
+        </div>
+
+        <ul class="step-list">
+          <li>
+            <div class="step-num">1</div>
+            <div class="step-body"><strong>Reveal your Leader.</strong> Place your chosen Leader card face-up in your Leader zone. Your Leader determines which faction cards are legal in your deck.</div>
+          </li>
+          <li>
+            <div class="step-num">2</div>
+            <div class="step-body"><strong>Choose your starting Program.</strong> Search your deck for one Program card of your choice, reveal it to your opponent, and place it in your hand. Then shuffle your deck.</div>
+          </li>
+          <li>
+            <div class="step-num">3</div>
+            <div class="step-body"><strong>Draw your opening hand.</strong> Draw 5 cards from your deck. You may shuffle your entire hand back into your deck once and draw 5 new cards — but only once.</div>
+          </li>
+          <li>
+            <div class="step-num">4</div>
+            <div class="step-body"><strong>Set starting Tech Level.</strong> Each player begins at Tech Level 1, unless their Leader card states otherwise.</div>
+          </li>
+          <li>
+            <div class="step-num">5</div>
+            <div class="step-body"><strong>Determine first player.</strong> Decide who goes first by any mutually agreed method (coin flip, dice roll, etc.).</div>
+          </li>
+        </ul>
+      </section>
+
+      <hr class="rule-divider" />
+
+      <!-- 03 DECK CONSTRUCTION -->
+      <section class="rule-section" id="deck">
+        <div class="section-header">
+          <span class="section-num">03</span>
+          <h2 class="section-title">Deck Construction</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="info-block">
+          <p>Your deck is your arsenal. Before sitting down to play, you must build a legal deck following these rules.</p>
+        </div>
+
+        <ul class="step-list">
+          <li>
+            <div class="step-num">①</div>
+            <div class="step-body"><strong>Minimum 60 cards.</strong> Your deck must contain at least 60 cards, not counting your Leader.</div>
+          </li>
+          <li>
+            <div class="step-num">②</div>
+            <div class="step-body"><strong>Maximum 3 copies.</strong> You may include no more than 3 copies of any single card in your deck.</div>
+          </li>
+          <li>
+            <div class="step-num">③</div>
+            <div class="step-body"><strong>Faction restriction.</strong> Your deck may only contain cards belonging to your Leader's faction, plus any <strong>Free Agent</strong> cards. For example, if your Leader is from the Neon Ninjas, you may only use Neon Ninja cards and Free Agent cards.</div>
+          </li>
+        </ul>
+
+        <div class="highlight-box tip">
+          <div class="hb-icon">💡</div>
+          <div class="hb-content">
+            <strong>Tip</strong>
+            <p>Free Agent cards are neutral and can be added to any deck regardless of faction. They're great for filling gaps in your strategy.</p>
+          </div>
+        </div>
+      </section>
+
+      <hr class="rule-divider" />
+
+      <!-- 04 TURN STRUCTURE -->
+      <section class="rule-section" id="turn">
+        <div class="section-header">
+          <span class="section-num">04</span>
+          <h2 class="section-title">Turn Structure</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="info-block">
+          <p>Each turn follows four phases in order. Within the Main Phase, you may take actions in any sequence you choose — there's no mandatory order.</p>
+        </div>
+
+        <div class="phase-grid">
+          <div class="phase-row">
+            <div class="phase-label">① Start of Turn</div>
+            <div class="phase-desc">Gain Tech Points equal to your current <strong>Tech Level</strong>. Resolve any "start of turn" effects on your cards (e.g., <em>Regenerate</em>).</div>
+          </div>
+          <div class="phase-row">
+            <div class="phase-label">② Draw Phase</div>
+            <div class="phase-desc">Draw <strong>1 card</strong> from the top of your deck. If your deck is empty and you cannot draw, you lose the game.</div>
+          </div>
+          <div class="phase-row">
+            <div class="phase-label">③ Main Phase</div>
+            <div class="phase-desc">In any order: <strong>deploy Units</strong> to your Server, <strong>attack</strong> with Units, <strong>play Hacks</strong>, <strong>attach Programs or Upgrades</strong>, and <strong>activate abilities</strong>. You may do as many or as few of these as you like.</div>
+          </div>
+          <div class="phase-row">
+            <div class="phase-label">④ End Phase</div>
+            <div class="phase-desc">Resolve any "end of turn" effects. Then <strong>discard down to 8 cards</strong> if your hand exceeds the maximum hand size.</div>
+          </div>
+        </div>
+
+        <div class="highlight-box">
+          <div class="hb-icon">⚡</div>
+          <div class="hb-content">
+            <strong>Tech Points carry over</strong>
+            <p>Unspent Tech Points do not reset at the end of your turn. They accumulate indefinitely — there is no maximum. Plan your big plays accordingly.</p>
+          </div>
+        </div>
+      </section>
+
+      <hr class="rule-divider" />
+
+      <!-- 05 PLAYING CARDS -->
+      <section class="rule-section" id="playing-cards">
+        <div class="section-header">
+          <span class="section-num">05</span>
+          <h2 class="section-title">Playing Cards</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="info-block">
+          <p>To play a card, spend Tech Points equal to the cost shown in the <strong>top-right corner</strong> of that card. Tech Points are your universal currency — they pay for Units, Hacks, Programs, and Upgrades alike.</p>
+        </div>
+
+        <ul class="step-list">
+          <li>
+            <div class="step-num">▸</div>
+            <div class="step-body"><strong>Units</strong> are deployed to your Server. They can attack on the following turn unless they have the <em>Charge</em> keyword.</div>
+          </li>
+          <li>
+            <div class="step-num">▸</div>
+            <div class="step-body"><strong>Hacks</strong> are instant-speed cards that can be played at any time, including during your opponent's turn. When multiple Hacks are played in response to each other, they resolve in last-in-first-out (LIFO) order via the <em>Priority</em> system.</div>
+          </li>
+          <li>
+            <div class="step-num">▸</div>
+            <div class="step-body"><strong>Programs</strong> attach to your Leader and increase your Tech Level. You may have a maximum of <strong>2 Programs</strong> attached at once. If you play a third, you must send one currently attached Program to the Scrapyard.</div>
+          </li>
+          <li>
+            <div class="step-num">▸</div>
+            <div class="step-body"><strong>Unit Upgrades</strong> attach to one of your Units to enhance it. Each Unit can hold <strong>1 Upgrade</strong> at a time unless its card text states otherwise.</div>
+          </li>
+        </ul>
+
+        <div class="highlight-box warning">
+          <div class="hb-icon">⚠️</div>
+          <div class="hb-content">
+            <strong>Priority & Hacks</strong>
+            <p>After any player takes an action, the opposing player gains priority and may respond with a Hack. Hacks stack and resolve in reverse order — the last Hack played resolves first. Once both players pass priority without acting, the current effect resolves.</p>
+          </div>
+        </div>
+      </section>
+
+      <hr class="rule-divider" />
+
+      <!-- 06 COMBAT -->
+      <section class="rule-section" id="combat">
+        <div class="section-header">
+          <span class="section-num">06</span>
+          <h2 class="section-title">Combat Rules</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="info-block">
+          <p>Combat is how you destroy your opponent's Units and, ultimately, their Leader. Units deal and receive damage simultaneously during an attack.</p>
+        </div>
+
+        <ul class="step-list">
+          <li>
+            <div class="step-num">▸</div>
+            <div class="step-body">
+              <strong>Attacking.</strong> During your Main Phase, tap an eligible Unit to declare an attack against an opposing Unit or the enemy Leader directly.<br/><br/>
+              If the opponent controls any Unit with <em>Taunt</em>, you must attack one of those Units first before targeting anything else.
+            </div>
+          </li>
+          <li>
+            <div class="step-num">▸</div>
+            <div class="step-body">
+              <strong>Charge.</strong> Freshly deployed Units must wait until your <em>next</em> turn to attack. Units with the <strong>Charge</strong> keyword may attack the same turn they enter the Server.
+            </div>
+          </li>
+          <li>
+            <div class="step-num">▸</div>
+            <div class="step-body">
+              <strong>Damage.</strong> A Unit's <strong>ATK</strong> (bottom-left number) is the damage it deals. Its <strong>HP</strong> (bottom-right number) is how much damage it can take before being destroyed. Damage is persistent — it does not heal at the end of a turn or phase.
+            </div>
+          </li>
+          <li>
+            <div class="step-num">▸</div>
+            <div class="step-body">
+              <strong>Destruction.</strong> When a Unit's HP reaches 0, it is immediately sent to its owner's Scrapyard.
+            </div>
+          </li>
+          <li>
+            <div class="step-num">▸</div>
+            <div class="step-body">
+              <strong>Attacking the Leader.</strong> If no opposing Units with Taunt are in play (or all blocking threats have been cleared), your Units may attack the enemy Leader directly, reducing their HP.
+            </div>
+          </li>
+        </ul>
+
+        <div class="highlight-box warning">
+          <div class="hb-icon">🩹</div>
+          <div class="hb-content">
+            <strong>Damage Does Not Reset</strong>
+            <p>Unlike some card games, damage dealt to Units sticks around between turns and phases. A Unit at 1 HP is one hit away from destruction — keep that in mind when choosing your attacks.</p>
+          </div>
+        </div>
+      </section>
+
+      <hr class="rule-divider" />
+
+      <!-- 07 WINNING -->
+      <section class="rule-section" id="winning">
+        <div class="section-header">
+          <span class="section-num">07</span>
+          <h2 class="section-title">Winning the Game</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="info-block">
+          <p>The game ends immediately when either win condition is met — even if it occurs in the middle of a chain of effects.</p>
+        </div>
+
+        <div class="win-grid">
+          <div class="win-card">
+            <div class="win-icon">💀</div>
+            <div class="win-title">Leader Defeated</div>
+            <p class="win-desc">Reduce your opponent's Leader's HP to 0 through combat or card effects. The moment this happens, you win.</p>
+          </div>
+          <div class="win-card">
+            <div class="win-icon">📭</div>
+            <div class="win-title">Empty Deck</div>
+            <p class="win-desc">If your opponent is required to draw a card but their deck is empty, they cannot draw and lose immediately.</p>
+          </div>
+        </div>
+      </section>
+
+      <hr class="rule-divider" />
+
+      <!-- 08 CARD TYPES -->
+      <section class="rule-section" id="card-types">
+        <div class="section-header">
+          <span class="section-num">08</span>
+          <h2 class="section-title">Card Types</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="card-types-grid">
+          <div class="card-type-item">
+            <span class="ct-tag magenta">Leader</span>
+            <div class="ct-name">Leader</div>
+            <p class="ct-desc">Your champion. The Leader starts in play and defines which faction cards you can use. If its HP hits 0, you lose. Each Leader may have unique starting abilities or Tech Level modifiers.</p>
+          </div>
+          <div class="card-type-item">
+            <span class="ct-tag">Unit</span>
+            <div class="ct-name">Unit</div>
+            <p class="ct-desc">Fighters deployed to your Server. Units attack enemy Units or the opposing Leader, deal damage equal to their ATK stat, and are destroyed when their HP reaches 0.</p>
+          </div>
+          <div class="card-type-item">
+            <span class="ct-tag yellow" style="-webkit-text-fill-color: #000;">Hack</span>
+            <div class="ct-name">Hack</div>
+            <p class="ct-desc">Instant-speed action cards that can be played at any time — even during your opponent's turn. After resolving, Hacks go to the Scrapyard. Subject to the Priority system.</p>
+          </div>
+          <div class="card-type-item">
+            <span class="ct-tag purple">Program</span>
+            <div class="ct-name">Program</div>
+            <p class="ct-desc">Attachments for your Leader that raise your Tech Level, giving you more resources each turn. You may have up to 2 Programs active at once. Replacing one sends the old Program to the Scrapyard.</p>
+          </div>
+          <div class="card-type-item">
+            <span class="ct-tag green">Upgrade</span>
+            <div class="ct-name">Unit Upgrade</div>
+            <p class="ct-desc">Attachments that enhance a specific Unit. Each Unit can hold 1 Upgrade at a time unless its card text allows more. If the Unit is destroyed, the Upgrade also goes to the Scrapyard.</p>
+          </div>
+          <div class="card-type-item">
+            <span class="ct-tag gray">Token</span>
+            <div class="ct-name">Unit Token</div>
+            <p class="ct-desc">Special Units created by card effects rather than played from your hand. Tokens use the stats and rules defined by the effect that created them. They go to the Scrapyard when destroyed.</p>
+          </div>
+        </div>
+      </section>
+
+      <hr class="rule-divider" />
+
+      <!-- 09 CARD ANATOMY -->
+      <section class="rule-section" id="anatomy">
+        <div class="section-header">
+          <span class="section-num">09</span>
+          <h2 class="section-title">Card Anatomy</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="info-block">
+          <p>Every Unit card follows the same layout. Understanding what each section means will help you evaluate cards quickly during play.</p>
+        </div>
+
+        <div class="card-anatomy">
+          <div class="card-diagram">
+            <div class="cd-top">
+              🥷
+              <div class="cd-cost">3</div>
+            </div>
+            <div class="cd-body">
+              <div class="cd-name">Shadow Blade</div>
+              <div class="cd-type">Neon Ninjas · Operative</div>
+              <div class="cd-text">Charge. Stealth — this unit is untargetable until it attacks.</div>
+              <div class="cd-stats">
+                <div class="cd-stat"><div class="cd-stat-val">4</div><div class="cd-stat-label">ATK</div></div>
+                <div class="cd-stat"><div class="cd-stat-val">3</div><div class="cd-stat-label">HP</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="anatomy-annotations">
+            <div class="annotation">
+              <span class="ann-bullet">[ TOP-RIGHT ]</span>
+              <p class="ann-text"><strong>Tech Cost</strong> — spend this many Tech Points to play the card.</p>
+            </div>
+            <div class="annotation">
+              <span class="ann-bullet">[ ART ]</span>
+              <p class="ann-text"><strong>Card Art</strong> — illustrates the unit, location, or event depicted.</p>
+            </div>
+            <div class="annotation">
+              <span class="ann-bullet">[ TITLE ]</span>
+              <p class="ann-text"><strong>Card Name</strong> — the unique identifier used when referencing this card in rules text.</p>
+            </div>
+            <div class="annotation">
+              <span class="ann-bullet">[ SUBTITLE ]</span>
+              <p class="ann-text"><strong>Faction · Type</strong> — which faction this card belongs to and its sub-type.</p>
+            </div>
+            <div class="annotation">
+              <span class="ann-bullet">[ TEXT BOX ]</span>
+              <p class="ann-text"><strong>Rules Text</strong> — abilities, keywords, and special effects. Card text overrides general rules when there is a conflict.</p>
+            </div>
+            <div class="annotation">
+              <span class="ann-bullet">[ BOTTOM-LEFT ]</span>
+              <p class="ann-text"><strong>ATK</strong> — the damage this Unit deals when it attacks.</p>
+            </div>
+            <div class="annotation">
+              <span class="ann-bullet">[ BOTTOM-RIGHT ]</span>
+              <p class="ann-text"><strong>HP</strong> — the amount of damage this Unit can take before it is destroyed.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="rule-divider" />
+
+      <!-- 10 GLOSSARY -->
+      <section class="rule-section" id="glossary">
+        <div class="section-header">
+          <span class="section-num">10</span>
+          <h2 class="section-title">Keyword Glossary</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="info-block">
+          <p>Keywords are shorthand for commonly used abilities. When a card has a keyword, it follows the definition below unless the card's own text specifies otherwise.</p>
+        </div>
+
+        <div class="glossary-grid">
+          <div class="gloss-item">
+            <div class="gloss-term">Server</div>
+            <p class="gloss-def">The shared play area where Leaders, Units, Programs, and Upgrades are placed. Both players share the same Server space.</p>
+          </div>
+          <div class="gloss-item">
+            <div class="gloss-term">Scrapyard</div>
+            <p class="gloss-def">Your discard pile. Destroyed Units, used Hacks, replaced Programs, and discarded cards all go here. Cards in the Scrapyard are face-up and visible to both players.</p>
+          </div>
+          <div class="gloss-item">
+            <div class="gloss-term">Tech Points</div>
+            <p class="gloss-def">Your resource currency, used to pay for cards and abilities. Gained at the start of each turn equal to your Tech Level. Unspent points carry over — there is no maximum.</p>
+          </div>
+          <div class="gloss-item">
+            <div class="gloss-term">Tech Level</div>
+            <p class="gloss-def">Determines how many Tech Points you gain at the start of each turn. Starts at 1. Increased by attaching Program cards to your Leader.</p>
+          </div>
+
+          <div class="gloss-item">
+            <div class="gloss-term">Charge <span class="gloss-tag">Keyword</span></div>
+            <p class="gloss-def">This Unit may attack the same turn it enters the Server, rather than waiting until the next turn.</p>
+          </div>
+          <div class="gloss-item">
+            <div class="gloss-term">Shield <span class="gloss-tag">Keyword</span></div>
+            <p class="gloss-def">Once per turn, when this Unit would take damage, prevent that damage entirely. Resets at the start of each turn.</p>
+          </div>
+          <div class="gloss-item">
+            <div class="gloss-term">Quantum Strike <span class="gloss-tag">Keyword</span></div>
+            <p class="gloss-def">This Unit may attack up to 2 different targets per turn instead of the usual 1.</p>
+          </div>
+          <div class="gloss-item">
+            <div class="gloss-term">Regenerate X <span class="gloss-tag">Keyword</span></div>
+            <p class="gloss-def">At the start of your turn, this Unit heals X damage, up to its maximum HP. The X value is defined on the card.</p>
+          </div>
+          <div class="gloss-item">
+            <div class="gloss-term">Dazzle X <span class="gloss-tag">Keyword</span></div>
+            <p class="gloss-def">A Dazzled Unit is impaired. Its controller must pay X Tech Points to remove the Dazzle effect before that Unit can act freely. Until Dazzle is removed, the Unit's actions are restricted for the turn.</p>
+          </div>
+          <div class="gloss-item">
+            <div class="gloss-term">Poison Bite <span class="gloss-tag">Keyword</span></div>
+            <p class="gloss-def">Any Unit that takes damage from this Unit is immediately destroyed, regardless of how much HP it has remaining.</p>
+          </div>
+          <div class="gloss-item">
+            <div class="gloss-term">Taunt <span class="gloss-tag">Keyword</span></div>
+            <p class="gloss-def">While any Unit with Taunt is on your side, opponents must attack a Taunting Unit before targeting anything else. When multiple Units have Taunt, the attacker chooses which one to attack first.</p>
+          </div>
+          <div class="gloss-item">
+            <div class="gloss-term">Booster <span class="gloss-tag">Keyword</span></div>
+            <p class="gloss-def">Units with Booster may attack the enemy Leader directly — but only if the opponent controls no other Units with Booster. If the opponent has a Booster Unit in play, you must deal with it first.</p>
+          </div>
+          <div class="gloss-item">
+            <div class="gloss-term">Stealth <span class="gloss-tag">Keyword</span></div>
+            <p class="gloss-def">This Unit cannot be targeted by attacks, Hacks, or abilities until it attacks first. Stealth does not reset at the start of turns — once broken, it's gone for the rest of the game.</p>
+          </div>
+          <div class="gloss-item">
+            <div class="gloss-term">Evasion <span class="gloss-tag">Keyword</span></div>
+            <p class="gloss-def">Once per turn, when this Unit takes damage, flip a coin. If you win the flip, the damage is prevented entirely.</p>
+          </div>
+          <div class="gloss-item">
+            <div class="gloss-term">Mirage <span class="gloss-tag">Keyword</span></div>
+            <p class="gloss-def">When this Unit enters the Server, create a 0/1 Data Pest Unit Token with Taunt. The Token appears alongside this Unit and must be accounted for by attackers.</p>
+          </div>
+        </div>
+
+        <div class="highlight-box tip" style="margin-top: 28px;">
+          <div class="hb-icon">📖</div>
+          <div class="hb-content">
+            <strong>Golden Rule</strong>
+            <p>If a card's text directly contradicts these rules, the card text takes priority. Cards are designed to break the rules in interesting ways — that's part of the game.</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-left">
+      <a href="/">NEON<span>.</span>NEXUS</a>
+    </div>
+    <div class="footer-right">© 2024 NEON NEXUS TCG — RULES V1.0</div>
+  </footer>
+
+  <script>
+    // Highlight active TOC item on scroll
+    const sections = document.querySelectorAll('.rule-section');
+    const tocLinks = document.querySelectorAll('.toc-list a');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          tocLinks.forEach(link => link.classList.remove('active'));
+          const active = document.querySelector(`.toc-list a[href="#${entry.target.id}"]`);
+          if (active) active.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+
+    sections.forEach(s => observer.observe(s));
+  </script>
+
+</body>
+</html>
