@@ -539,13 +539,13 @@
     .syndicate-card:hover::before { opacity: 0.12; }
 
     .syndicate-card .card-icon {
-      font-size: 1.5rem;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
     .syndicate-card .card-icon img {
-      width: 40px;
-      height: 40px;
+      width: 56px;
+      height: 56px;
       object-fit: contain;
+      display: block;
     }
 
     .syndicate-card h3 {
@@ -668,85 +668,25 @@
 
     .tcg-card {
       flex-shrink: 0;
-      width: 200px;
-      background: linear-gradient(135deg, #0a0f2e 0%, #050b20 100%);
-      border: 1px solid rgba(0,245,255,0.2);
+      width: 180px;
       clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
       position: relative;
       overflow: hidden;
       transition: transform 0.3s, box-shadow 0.3s;
       cursor: pointer;
+      display: block;
+      text-decoration: none;
+      border: 1px solid rgba(0,245,255,0.15);
+    }
+
+    .tcg-card img {
+      width: 100%;
+      display: block;
     }
 
     .tcg-card:hover {
       transform: translateY(-12px) rotate(-1deg);
-      box-shadow: 0 20px 60px rgba(0,245,255,0.2);
-    }
-
-    .tcg-card-art {
-      width: 100%;
-      height: 140px;
-      background: linear-gradient(135deg, var(--art-from, #00f5ff22), var(--art-to, #ff006e22));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.5rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .tcg-card-art::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, transparent 60%, #050b20 100%);
-    }
-
-    .tcg-card-body {
-      padding: 12px;
-    }
-
-    .tcg-card-name {
-      font-family: 'Orbitron', monospace;
-      font-size: 0.65rem;
-      font-weight: 700;
-      color: #fff;
-      letter-spacing: 0.1em;
-      margin-bottom: 4px;
-    }
-
-    .tcg-card-type {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.55rem;
-      color: var(--cyan);
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-    }
-
-    .tcg-card-stats {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
-      padding-top: 8px;
-      border-top: 1px solid rgba(0,245,255,0.1);
-    }
-
-    .tcg-stat {
-      text-align: center;
-    }
-
-    .tcg-stat-val {
-      font-family: 'Orbitron', monospace;
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: var(--cyan);
-    }
-
-    .tcg-stat-label {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.45rem;
-      color: rgba(205,217,255,0.3);
-      letter-spacing: 0.2em;
+      box-shadow: 0 20px 60px rgba(0,245,255,0.25);
     }
 
     /* ── CTA BAND ── */
@@ -1158,89 +1098,35 @@
       </div>
 
       <div class="card-stack">
-        <!-- Data Drakes -->
-        <div class="tcg-card">
-          <div class="tcg-card-art" style="--art-from: rgba(168,85,247,0.4); --art-to: rgba(40,0,80,0.9);">🐉</div>
-          <div class="tcg-card-body">
-            <div class="tcg-card-name">Drake Archivist</div>
-            <div class="tcg-card-type">Data Drakes · Specialist</div>
-            <div class="tcg-card-stats">
-              <div class="tcg-stat"><div class="tcg-stat-val">4</div><div class="tcg-stat-label">PWR</div></div>
-              <div class="tcg-stat"><div class="tcg-stat-val">7</div><div class="tcg-stat-label">DEF</div></div>
-              <div class="tcg-stat"><div class="tcg-stat-val">3</div><div class="tcg-stat-label">SPD</div></div>
-            </div>
-          </div>
-        </div>
+        <!-- Neon Ninjas – Kazuki -->
+        <a href="/cardcatalog/" class="tcg-card">
+          <img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/0928b7c2-a194-429b-b7cf-982d1473e079/222Kazuki.png" alt="Kazuki – Neon Ninjas">
+        </a>
 
-        <!-- Neon Ninjas -->
-        <div class="tcg-card">
-          <div class="tcg-card-art" style="--art-from: rgba(56,189,248,0.4); --art-to: rgba(0,30,60,0.9);">🥷</div>
-          <div class="tcg-card-body">
-            <div class="tcg-card-name">Shadow Blade</div>
-            <div class="tcg-card-type">Neon Ninjas · Operative</div>
-            <div class="tcg-card-stats">
-              <div class="tcg-stat"><div class="tcg-stat-val">6</div><div class="tcg-stat-label">PWR</div></div>
-              <div class="tcg-stat"><div class="tcg-stat-val">2</div><div class="tcg-stat-label">DEF</div></div>
-              <div class="tcg-stat"><div class="tcg-stat-val">9</div><div class="tcg-stat-label">SPD</div></div>
-            </div>
-          </div>
-        </div>
+        <!-- Digital Dragonlords – Nyla -->
+        <a href="/cardcatalog/" class="tcg-card">
+          <img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/ae935ec8-d90f-4a27-a177-001ff5c2c2ca/021Nyla.png" alt="Nyla – Digital Dragonlords">
+        </a>
 
         <!-- Quantum Quorum -->
-        <div class="tcg-card">
-          <div class="tcg-card-art" style="--art-from: rgba(239,68,68,0.4); --art-to: rgba(80,0,0,0.9);">⚛️</div>
-          <div class="tcg-card-body">
-            <div class="tcg-card-name">Quorum Theorist</div>
-            <div class="tcg-card-type">Quantum Quorum · Unit</div>
-            <div class="tcg-card-stats">
-              <div class="tcg-stat"><div class="tcg-stat-val">8</div><div class="tcg-stat-label">PWR</div></div>
-              <div class="tcg-stat"><div class="tcg-stat-val">3</div><div class="tcg-stat-label">DEF</div></div>
-              <div class="tcg-stat"><div class="tcg-stat-val">4</div><div class="tcg-stat-label">SPD</div></div>
-            </div>
-          </div>
-        </div>
+        <a href="/cardcatalog/" class="tcg-card">
+          <img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/af6260e6-9676-4f39-9dfc-24ed560a96cb/038.png" alt="Quantum Quorum card">
+        </a>
 
-        <!-- Techno Templars -->
-        <div class="tcg-card">
-          <div class="tcg-card-art" style="--art-from: rgba(34,197,94,0.4); --art-to: rgba(0,40,10,0.9);">⚔️</div>
-          <div class="tcg-card-body">
-            <div class="tcg-card-name">Iron Paladin</div>
-            <div class="tcg-card-type">Techno Templars · Guardian</div>
-            <div class="tcg-card-stats">
-              <div class="tcg-stat"><div class="tcg-stat-val">5</div><div class="tcg-stat-label">PWR</div></div>
-              <div class="tcg-stat"><div class="tcg-stat-val">8</div><div class="tcg-stat-label">DEF</div></div>
-              <div class="tcg-stat"><div class="tcg-stat-val">3</div><div class="tcg-stat-label">SPD</div></div>
-            </div>
-          </div>
-        </div>
+        <!-- Techno Templars – Tsuro -->
+        <a href="/cardcatalog/" class="tcg-card">
+          <img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/4f0172ee-0ce5-43fd-a03a-85ecff7f0440/045Tsuro.png" alt="Tsuro – Techno Templars">
+        </a>
 
-        <!-- Free Agent -->
-        <div class="tcg-card">
-          <div class="tcg-card-art" style="--art-from: rgba(245,158,11,0.35); --art-to: rgba(60,30,0,0.9);">🃏</div>
-          <div class="tcg-card-body">
-            <div class="tcg-card-name">Street Mercenary</div>
-            <div class="tcg-card-type">Free Agents · Neutral</div>
-            <div class="tcg-card-stats">
-              <div class="tcg-stat"><div class="tcg-stat-val">5</div><div class="tcg-stat-label">PWR</div></div>
-              <div class="tcg-stat"><div class="tcg-stat-val">5</div><div class="tcg-stat-label">DEF</div></div>
-              <div class="tcg-stat"><div class="tcg-stat-val">5</div><div class="tcg-stat-label">SPD</div></div>
-            </div>
-          </div>
-        </div>
+        <!-- Neon Ninjas – Satoshi -->
+        <a href="/cardcatalog/" class="tcg-card">
+          <img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/2909ac70-680d-4bda-a083-e11f8cc31a19/221Satoshi.png" alt="Satoshi – Neon Ninjas">
+        </a>
 
-        <!-- Event Card -->
-        <div class="tcg-card">
-          <div class="tcg-card-art" style="--art-from: rgba(0,245,255,0.2); --art-to: rgba(168,85,247,0.25);">💥</div>
-          <div class="tcg-card-body">
-            <div class="tcg-card-name">Neon Surge</div>
-            <div class="tcg-card-type">All Factions · Event</div>
-            <div class="tcg-card-stats">
-              <div class="tcg-stat"><div class="tcg-stat-val">—</div><div class="tcg-stat-label">PWR</div></div>
-              <div class="tcg-stat"><div class="tcg-stat-val">—</div><div class="tcg-stat-label">DEF</div></div>
-              <div class="tcg-stat"><div class="tcg-stat-val">—</div><div class="tcg-stat-label">SPD</div></div>
-            </div>
-          </div>
-        </div>
+        <!-- Digital Dragonlords – Drake -->
+        <a href="/cardcatalog/" class="tcg-card">
+          <img src="https://images.squarespace-cdn.com/content/v1/6532ad5930008c373bf02ead/177368ed-b6f6-4e2f-a9b4-cff0cda28ae5/022Drake.png" alt="Drake – Digital Dragonlords">
+        </a>
       </div>
     </div>
   </section>
