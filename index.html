@@ -2,6 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BWFRTBRY9G"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-BWFRTBRY9G');
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Neon Nexus TCG — Sci-Fi Cyberpunk Trading Card Game</title>
   <meta name="description" content="Neon Nexus TCG is a sci-fi cyberpunk trading card game currently in development. Command one of five syndicates, build your deck, and battle for control of the city. Join the Discord and follow development updates." />
@@ -1153,10 +1161,20 @@
           <h3>Stay in the Loop</h3>
           <p>New cards, updates, and Nexus lore — straight to your inbox.</p>
         </div>
-        <div class="newsletter-form">
-          <input type="email" placeholder="your@email.com" />
-          <button type="button">Transmit</button>
-        </div>
+        <!--
+          NEWSLETTER SETUP: To activate email signups, go to https://formspree.io,
+          sign up free with mtgmondays@gmail.com, click "New Form", name it
+          "Neon Nexus Newsletter", and replace YOUR_FORM_ID below with the ID
+          they give you (looks like: xabcdefg). That's it — submissions will
+          be emailed to you automatically.
+        -->
+        <form class="newsletter-form" id="newsletter-form"
+              action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+          <input type="email" name="email" placeholder="your@email.com"
+                 required autocomplete="email" />
+          <button type="submit">Transmit</button>
+        </form>
+        <p id="newsletter-msg"></p>
       </div>
     </div>
   </section>
@@ -1208,5 +1226,33 @@
     </div>
   </footer>
 
+<script>
+  (function() {
+    var form = document.getElementById('newsletter-form');
+    var msg  = document.getElementById('newsletter-msg');
+    if (!form) return;
+    var style = 'font-family:"Share Tech Mono",monospace;font-size:.75rem;letter-spacing:.15em;margin-top:12px;';
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      }).then(function(r) {
+        if (r.ok) {
+          form.style.display = 'none';
+          msg.setAttribute('style', style + 'color:var(--cyan);display:block;');
+          msg.textContent = '// TRANSMISSION RECEIVED — SIGNAL LOGGED';
+        } else {
+          msg.setAttribute('style', style + 'color:var(--magenta);display:block;');
+          msg.textContent = '// TRANSMISSION FAILED — PLEASE TRY AGAIN';
+        }
+      }).catch(function() {
+        msg.setAttribute('style', style + 'color:var(--magenta);display:block;');
+        msg.textContent = '// CONNECTION ERROR — PLEASE TRY AGAIN';
+      });
+    });
+  })();
+</script>
 </body>
 </html>
