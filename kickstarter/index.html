@@ -11,11 +11,25 @@
     gtag('config', 'G-BWFRTBRY9G');
   </script><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Kickstarter — Neon Nexus TCG</title>
+  <meta name="description" content="Back Neon Nexus TCG on Kickstarter — a cyberpunk trading card game. Sign up to be notified at launch and get exclusive early backer rewards." />
+  <link rel="icon" type="image/png" href="/icons/NNIcon.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://fatchpack.github.io/kickstarter/" />
+  <meta property="og:title" content="Back Neon Nexus TCG on Kickstarter" />
+  <meta property="og:description" content="A cyberpunk trading card game coming to Kickstarter. Sign up to be notified at launch and receive exclusive early backer rewards." />
+  <meta property="og:image" content="https://fatchpack.github.io/cards/NeonNinjas/153Kazuki.png" />
+  <meta property="og:site_name" content="Neon Nexus TCG" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Back Neon Nexus TCG on Kickstarter" />
+  <meta name="twitter:description" content="A cyberpunk TCG coming to Kickstarter. Sign up to be notified at launch." />
+  <meta name="twitter:image" content="https://fatchpack.github.io/cards/NeonNinjas/153Kazuki.png" />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet"/>
   <style>
     :root{--cyan:#00f5ff;--magenta:#ff006e;--yellow:#ffe600;--green:#22c55e;--dark:#030610;--darker:#010308;--mid:#0a0f2e;--grid-color:rgba(0,245,255,0.05);--glow-cyan:0 0 20px rgba(0,245,255,0.6),0 0 60px rgba(0,245,255,0.2);--glow-magenta:0 0 20px rgba(255,0,110,0.6),0 0 60px rgba(255,0,110,0.2);}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     body{background:var(--darker);color:#cdd9ff;font-family:'Rajdhani',sans-serif;font-size:16px;overflow-x:hidden;cursor:crosshair;}
+    input,textarea,select{cursor:text;}
+    button,a,[role="button"]{cursor:pointer;}
     body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.12) 2px,rgba(0,0,0,0.12) 4px);pointer-events:none;z-index:9999;}
     .grid-bg{position:fixed;inset:0;background-image:linear-gradient(var(--grid-color) 1px,transparent 1px),linear-gradient(90deg,var(--grid-color) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;}
     nav{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:70px;background:linear-gradient(180deg,rgba(3,6,16,0.98) 0%,rgba(3,6,16,0.8) 100%);border-bottom:1px solid rgba(0,245,255,0.15);backdrop-filter:blur(12px);}
@@ -108,7 +122,7 @@
     <li><a href="/cardcatalog/">Card Catalog</a></li>
     <li><a href="/updates/">Updates</a></li>
     <li><a href="/media/">Media</a></li>
-    <li><a href="https://discord.gg/UjmhvUgUZN">Discord</a></li>
+    <li><a href="https://discord.gg/UjmhvUgUZN" target="_blank" rel="noopener noreferrer">Discord</a></li>
   </ul>
   <a href="/kickstarter/" class="nav-cta active">Kickstarter</a>
 </nav>
@@ -163,7 +177,7 @@
     <div class="perk-card">
       <div class="perk-icon">🏙️</div>
       <div class="perk-title">Lore Document</div>
-      <p class="perk-desc">A deep-dive into the world of Nexus — the four factions, the city's history, and the war for control. For those who want the full picture.</p>
+      <p class="perk-desc">A deep-dive into the world of Nexus — all five factions, the city's history, and the war for control. For those who want the full picture.</p>
     </div>
     <div class="perk-card">
       <div class="perk-icon">💬</div>
@@ -180,12 +194,42 @@
   <div class="notify-box">
     <h2>Get Notified at Launch</h2>
     <p>Leave your email and we'll ping you the moment the Kickstarter goes live. No spam — just one message when it counts.</p>
-    <div class="email-form">
-      <input type="email" placeholder="your@email.com"/>
-      <button type="button">Notify Me</button>
-    </div>
+    <form class="email-form" id="notify-form" action="https://formspree.io/f/xreyqlpe" method="POST">
+      <input type="hidden" name="source" value="Kickstarter Launch Notification" />
+      <input type="email" name="email" placeholder="your@email.com" required autocomplete="email" />
+      <button type="submit">Notify Me</button>
+    </form>
+    <p id="notify-msg"></p>
   </div>
 </section>
+<script>
+  (function() {
+    var form = document.getElementById('notify-form');
+    var msg  = document.getElementById('notify-msg');
+    if (!form) return;
+    var style = 'font-family:"Share Tech Mono",monospace;font-size:.75rem;letter-spacing:.15em;margin-top:16px;display:block;';
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      }).then(function(r) {
+        if (r.ok) {
+          form.style.display = 'none';
+          msg.setAttribute('style', style + 'color:#00f5ff;');
+          msg.textContent = '// SIGNAL LOGGED — WE\'LL PING YOU AT LAUNCH';
+        } else {
+          msg.setAttribute('style', style + 'color:#ff006e;');
+          msg.textContent = '// TRANSMISSION FAILED — PLEASE TRY AGAIN';
+        }
+      }).catch(function() {
+        msg.setAttribute('style', style + 'color:#ff006e;');
+        msg.textContent = '// CONNECTION ERROR — PLEASE TRY AGAIN';
+      });
+    });
+  })();
+</script>
 
 <footer class="site-footer">
   <div class="footer-inner">
@@ -202,8 +246,8 @@
       <li><a href="/media/">Media</a></li>
     </ul></div>
     <div class="footer-col"><h4>Community</h4><ul>
-      <li><a href="https://discord.gg/UjmhvUgUZN">Discord</a></li>
-      <li><a href="https://www.youtube.com/@NeonNexusTCG">YouTube</a></li>
+      <li><a href="https://discord.gg/UjmhvUgUZN" target="_blank" rel="noopener noreferrer">Discord</a></li>
+      <li><a href="https://www.youtube.com/@NeonNexusTCG" target="_blank" rel="noopener noreferrer">YouTube</a></li>
     </ul></div>
     <div class="footer-col"><h4>Factions</h4><ul>
       <li><a href="/cardcatalog/#drakes" style="color:rgba(168,85,247,0.7)">Digital Dragonlords</a></li>
